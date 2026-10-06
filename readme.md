@@ -1,5 +1,9 @@
 # Programación web con Spring Framework & Spring Boot
 
+![alt text](image.png)
+
+https://spring.io/
+
 ## Primeros pasos
 
 ### Spring Boot ¿Qué es y cómo funciona?
@@ -17,6 +21,8 @@ Solo necesita una configuración básica, que permite el uso de librerías, inte
 Es un conjunto de proyectos open source desarrollados en Java con el objetivo de agilizar el proceso de desarrollo de aplicaciones.
 
 Cuenta con cantidad de herramientas (tecnologías) que tienen como objetivo facilitar el trabajo de los desarrolladores.
+
+![alt text](image-1.png)
 
 
 ### Estructura básica de un proyecto Spring
@@ -61,7 +67,6 @@ No devuelve vistas HTML, como haría un controlador tradicional (@Controller), s
 
 Por eso es la base para construir un **API RESTful.**
 
-[Ir a las anotaciones de Spring](./APOYO_TEORIA/componentes-spring.md)
 
 ## Primeras aplicaciones
 
@@ -71,22 +76,6 @@ https://www.jetbrains.com/help/idea/your-first-spring-application.html
 ### Segunda aplicación Spring
 https://www.jetbrains.com/help/idea/spring-support-tutorial.html
 
-
-## Apoyo teoría
-- Java en general
-    - [Patrones de diseño](./APOYO_TEORIA/patrones.md)
-    - [Api Stream](./APOYO_TEORIA/api-stream.md)
-    - [Comparator](./APOYO_TEORIA/Comparators.md)
-- [Api REST](./APOYO_TEORIA/API-REST.md) 
-- [Anotaciones Servicio y Controlador](./APOYO_TEORIA/Anotaciones-Servicio-Controlador.md)
-- [Validaciones](./APOYO_TEORIA/Validaciones.md)
-- [Spring Security](./APOYO_TEORIA/SpringSecurity.md)
-- [JPA](./APOYO_TEORIA/JPA.md)
-     - [Comparativa entre JPA y SpringDataJPA](./APOYO_TEORIA/Comparativa_JPA_vs_SpringDataJPA.md)
-     - [Asociaciones](./APOYO_TEORIA/JPA-%20Asociaciones.md)
-     - [Paginación](./APOYO_TEORIA/Pageable.md)
-     - [JPA Avanzado](./APOYO_TEORIA/findAll_Example_QBE.md)
-- [Thymeleaf](./APOYO_TEORIA/Thymeleaf.md)
 
 ## Webs de referencia
 
@@ -98,7 +87,7 @@ https://www.jetbrains.com/idea/spring/
 ___
 
 ## Página principal del curso
-[VOLVER PÁGINA PRINCIPAL](https://github.com/profeMelola/DWES-00-2025-26)
+[VOLVER PÁGINA PRINCIPAL](https://github.com/profeMelola/DWES-00-2026-27)
 
 ## Licencia
 
