@@ -39,7 +39,7 @@ IntelliJ → **New Project → Spring Boot** (Initializr):
 | Group | `es.daw` |
 | Package name | `es.daw.altausuario` |
 | Type | Maven |
-| JDK / Java | 21 |
+| JDK / Java | 25 |
 | Packaging | Jar |
 | Spring Boot | la última estable que ofrezca (4.1.x) |
 | Dependencias | **Spring Web**, **Thymeleaf**, **Spring Boot DevTools** |

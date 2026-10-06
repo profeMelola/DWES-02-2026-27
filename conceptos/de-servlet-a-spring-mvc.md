@@ -77,7 +77,7 @@ Desde IntelliJ (**New Project → Spring Boot**) o en [start.spring.io](https://
 Dos ventajas importantes frente a JSP:
 
 - **Plantillas naturales:** un `.html` de Thymeleaf se abre en el navegador sin servidor (los `th:*` se ignoran y se ven los textos de ejemplo). Útil para trabajar con diseño.
-- **Escapado por defecto:** `th:text` escapa el HTML (protección frente a XSS). En JSP, `${nombre}` escrito directamente en la página **no** escapa.
+- **Escapado por defecto:** `th:text` escapa el HTML (protección frente al ataque XSS (Cross-Site Scripting: el atacante consigue ejecutar su JavaScript en la página de tu aplicación). En JSP, `${nombre}` escrito directamente en la página **no** escapa.
 
 ## 6. Anotaciones de hoy
 
