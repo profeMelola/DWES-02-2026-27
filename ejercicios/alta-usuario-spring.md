@@ -144,6 +144,28 @@ public class OpcionesService {
 }
 ```
 
+### Index.html
+
+```
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenido</title>
+    <!-- th:href="@{...}" añade el context path automáticamente (antes: ${pageContext.request.contextPath}) -->
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="oscuro">
+<div class="card">
+    <h1>¿Quieres darte de alta en la aplicación?</h1>
+    <p>Regístrate en unos segundos y cuéntanos qué tecnología te interesa más.</p>
+    <!-- Un enlace siempre es GET -> @GetMapping("/alta") -->
+    <a class="boton" th:href="@{/alta}">Darme de alta</a>
+</div>
+</body>
+</html>
+```
+
 ### Plantilla a completar: `formulario.html`
 
 ```html
