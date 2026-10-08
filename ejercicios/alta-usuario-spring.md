@@ -227,16 +227,41 @@ public String gestionarErrorFichero(FicheroNoEncontradoException e, Model model)
 
 ## Para pensar (y comentar en clase)
 
-1. ¿Dónde está ahora el `HttpServletRequest`? ¿Ha desaparecido? *(Pista: DispatcherServlet.)*
-2. ¿Por qué el controlador ya no tiene `try/catch`?
-3. ¿Qué tendría que cambiar si mañana las tecnologías vienen de una base de datos? ¿Y el controlador?
-4. En `confirmacion.html`, escribe como nombre `<b>Bart</b>`. ¿Qué pasaba en el JSP con `${nombre}`? ¿Y con `th:text`?
+**1. ¿Dónde está ahora el `HttpServletRequest`? ¿Ha desaparecido?**
 
-## Retos
+ No ha desaparecido: lo maneja Spring.                                                                         
+  - Spring Boot lleva dentro un Tomcat embebido, así que por debajo sigue habiendo Servlets.                                                                    
+  - Hay un único Servlet, el DispatcherServlet, que recibe todas las peticiones (patrón Front Controller).                                                      
+                                                                                 Cuando llega POST /alta, el DispatcherServlet:                                                               
+  - Recibe el HttpServletRequest de Tomcat.                                                                                                                    
+  - Busca el método que atiende esa URL (@PostMapping("/alta")).                                                                                               
+  - Hace por nosotros el request.getParameter("nombre") y nos lo pasa como @RequestParam String nombre.                                                        
+  - Llama a nuestro método.                                                                                                                                    
+  - Con el String que devolvemos ("confirmacion") genera templates/confirmacion.html. Esto sustituye al forward.    
 
-- **[El alumno]** Cargar las listas **una sola vez** al arrancar, como en el `init()` del Servlet. ¿Qué pasa si falta el fichero?
-- **[El alumno]** Validar también que el email no esté vacío y que se haya elegido al menos un nivel.
-- **[Próxima sesión]** Sustituir los cuatro `@RequestParam` por un objeto `Usuario` con `th:object` + `@Valid`.
+**2. ¿Por qué el controlador ya no tiene `try/catch`?**
 
-## Solución
+La excepción es unchecked. FicheroNoEncontradoException extiende RuntimeException, así que el compilador no obliga a capturarla. 
+
+En la UD1 era checked y había que poner try/catch en cada Servlet.                                                                                                                 
+Los errores se gestionan en un solo sitio. La excepción pasa por el controlador sin que este la capture y llega al DispatcherServlet. Este la envía a GlobalExceptionHandler (@ControllerAdvice), que devuelve la vista error.                                                                    
+
+Antes había try/catch y forward a error.jsp en cada Servlet. Ahora hay una sola clase que gestiona los errores de todos los controladores. 
+
+**3. ¿Qué tendría que cambiar si mañana las tecnologías vienen de una base de datos? ¿Y el controlador?**
+
+Solo cambia el servicio (y se añade la capa de datos). El controlador no cambia nada.                                                                         
+                                                                             
+El controlador solo llama a opcionesService.getTecnologias() y recibe una List<String>. No sabe de dónde salen los datos.                                     
+                                                                               Habría que hacer esto:                                                                                                                                        
+  - Añadir JPA y H2 al pom.xml.                                                                                                                                 
+  - Crear la entidad Tecnologia y el repositorio TecnologiaRepository.                                                                                          
+  - En OpcionesService, leer del repositorio en vez del fichero. 
+
+**4. En `confirmacion.html`, escribe como nombre `<b>Bart</b>`. ¿Qué pasaba en el JSP con `${nombre}`? ¿Y con `th:text`?**
+
+  **- En el JSP con ${nombre}:** la Expression Language no escapa el HTML. El texto se copia tal cual en la página, así que el navegador lo interpreta y sale Bart en negrita. Es una vulnerabilidad XSS (Cross-Site Scripting).
+  
+  **- En Thymeleaf con th:text:** se escapa automáticamente. Thymeleaf convierte < en &lt; y > en &gt;, así que en pantalla se ve el texto literal `<b>Bart</b>`, sin negrita y sin ejecutar nada. La opción      
+  segura es la que se usa por defecto.
 
