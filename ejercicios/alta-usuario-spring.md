@@ -146,7 +146,7 @@ public class OpcionesService {
 
 ### Index.html
 
-```
+```html
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -230,6 +230,29 @@ public String gestionarErrorFichero(FicheroNoEncontradoException e, Model model)
     model.addAttribute("mensajeError", e.getMessage());
     return "error";
 }
+```
+
+### Plantilla error
+
+```html
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ha ocurrido un error</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="oscuro">
+<div class="card">
+    <div class="error-icon">&#9888;</div>
+    <h1>Vaya, algo ha fallado</h1>
+    <!-- mensajeError lo pone el @ExceptionHandler de GlobalExceptionHandler. Si es un error de Spring (p. ej. 404), muestra el estado -->
+    <p th:text="${mensajeError} ?: ('Error ' + ${status} + ': ' + ${error})">Mensaje</p>
+    <a class="volver" th:href="@{/}">&larr; Volver al inicio</a>
+</div>
+</body>
+</html>
+
 ```
 
 ---
