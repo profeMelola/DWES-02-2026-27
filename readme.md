@@ -32,7 +32,7 @@ Spring Boot es una extensión del framework Spring cuya finalidad es simplificar
 
 ### Spring Platform
 
-Conjunto de proyectos open source en Java para agilizar el desarrollo de aplicaciones (Spring Framework, Spring Boot, Spring Data, Spring Security…).
+Conjunto de proyectos open source en Java para agilizar el desarrollo de aplicaciones (Spring Framework, Spring Data, Spring Security…).
 
 ![alt text](image-1.png)
 
