@@ -213,13 +213,34 @@ public class OpcionesService {
 ### Plantilla a completar: `confirmacion.html`
 
 ```html
-<h1 th:text="|¡Te has dado de alta correctamente, ${nombre}!|">¡Alta correcta!</h1>
-<dl>
-    <dt>Email</dt><dd th:text="...">email</dd>
-    <dt>Tecnología</dt><dd th:text="...">tecnología</dd>
-    <dt>Nivel</dt><dd th:text="${#strings.listJoin(niveles, ', ')}">niveles</dd>
-</dl>
-<a class="volver" th:href="@{/}">&larr; Volver al inicio</a>
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Alta correcta</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="oscuro">
+<div class="card">
+    <div class="ok">&#10003;</div>
+    <!-- th:text escapa el HTML (seguro frente a XSS). ${nombre} en JSP NO lo escapaba -->
+    <!-- |...| (sustitución literal): mezcla texto fijo y ${...}. Sin las tuberías Thymeleaf intenta
+         interpretar todo como una expresión y falla ("Could not parse as expression") -->
+    <h1 th:text="|Te has dado de alta correctamente, ${nombre}!|">¡Alta correcta!</h1>
+
+    <dl>
+        <dt>Email</dt><dd th:text="${email}">email</dd>
+        <dt>Tecnología</dt><dd th:text="${tecnologia}">tecnología</dd>
+        <dt>Nivel</dt>
+        <!-- th:if / th:unless con la MISMA condición = if / else: solo se pinta uno de los dos <dd> -->
+        <dd th:unless="${#lists.isEmpty(niveles)}" th:text="${#strings.listJoin(niveles, ', ')}">niveles</dd>
+        <dd th:if="${#lists.isEmpty(niveles)}">(sin indicar)</dd>
+    </dl>
+
+    <a class="volver" th:href="@{/}">&larr; Volver al inicio</a>
+</div>
+</body>
+</html>
 ```
 
 ### Gestión de errores: `@ExceptionHandler`
