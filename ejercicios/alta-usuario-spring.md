@@ -331,3 +331,8 @@ El controlador solo llama a opcionesService.getTecnologias() y recibe una List<S
   **- En Thymeleaf con th:text:** se escapa automáticamente. Thymeleaf convierte < en &lt; y > en &gt;, así que en pantalla se ve el texto literal `<b>Bart</b>`, sin negrita y sin ejecutar nada. La opción      
   segura es la que se usa por defecto.
 
+---
+
+## Siguiente paso
+
+[Versión 2: validación con `@ModelAttribute`, DTO `record`, `BindingResult` e internacionalización →](./alta-usuario-spring-validacion.md)
