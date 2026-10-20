@@ -78,7 +78,7 @@ src/
 
 - [Ejercicios](./ejercicios/readme.md)
   - [1. Alta de usuario: de Servlet/JSP a Spring MVC](./ejercicios/alta-usuario-spring.md)
-  - [2. Alta de usuario v2: validacioón](./ejercicios/alta-usuario-spring-validacion.md)
+  - [2. Alta de usuario v2: validación](./ejercicios/alta-usuario-spring-validacion.md)
 
 
 ## Tutoriales de apoyo
