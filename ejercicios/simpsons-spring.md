@@ -73,31 +73,6 @@
 
 ---
 
-## Pruebas mínimas
 
-| Prueba | Resultado esperado |
-|---|---|
-| `/personajes` | 30 personajes ordenados por nombre |
-| Lugar *Escuela Primaria*, edad máx. 12, ordenar por edad | Solo estudiantes de 12 años o menos, de menor a mayor |
-| *Solo familia Simpson* + descendente por edad | Abe primero, Maggie última |
-| Límite 3 | Solo 3 filas |
-| Edad máx. `-5` o límite `100` | Error junto al campo, sin tabla, filtros conservados |
-| `/personajes?edadMax=abc` | Error de tipo con mensaje propio, no un 400 |
-| `/personajes?ordenarPor=ocupacion` | Error de validación en *Ordenar por* |
-
----
-
-## Entrega
-
-- Repositorio de GitHub `simpsons-spring` con un `README.md` que incluya:
-  - Capturas: listado inicial, búsqueda con filtros y formulario con errores.
-  - En 3-4 líneas: **qué ha cambiado** respecto a la versión Jakarta y **qué se ha mantenido igual**.
-
-## Ampliación (opcional)
-
-- Fragmento Thymeleaf (`th:fragment`) para la cabecera, reutilizado en una página `/personajes/{nombre}` con el detalle de un personaje.
-- Tests con `MockMvc` de al menos tres de las pruebas mínimas.
-
----
 
 [← Volver a ejercicios](./readme.md)
