@@ -46,7 +46,7 @@ IntelliJ → **New Project → Spring Boot** (Initializr):
 
 <img width="250" height="300" alt="image" src="https://github.com/user-attachments/assets/f107efce-0ae2-4261-ad4d-3c0ff6bda93b" />
 
-<img width="2560" height="100" alt="image" src="https://github.com/user-attachments/assets/7fa97e9b-80fd-494e-8799-ad47e70fcd10" />
+<img width="256" height="100" alt="image" src="https://github.com/user-attachments/assets/7fa97e9b-80fd-494e-8799-ad47e70fcd10" />
 
 <img width="230" height="110" alt="image" src="https://github.com/user-attachments/assets/7ef258fe-d9fc-4907-8493-4e8580a2f318" />
 
