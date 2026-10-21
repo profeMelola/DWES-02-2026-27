@@ -22,6 +22,7 @@
 
 **Dependencias nuevas:** `spring-boot-starter-validation` (en Initializr: **Validation**), que trae Jakarta Bean Validation + Hibernate Validator, y **Lombok**.
 
+<img width="250" height="134" alt="image" src="https://github.com/user-attachments/assets/22edfb05-d905-4d69-a949-e99c8b0624ef" />
 
 ---
 
