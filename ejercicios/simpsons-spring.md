@@ -27,7 +27,7 @@
 
 | Capa | Clase | Responsabilidad |
 |---|---|---|
-| Modelo | `Personaje` (`dto`) | Datos de un personaje (solo lectura) |
+| Modelo | `Personaje` (`record en paquete model`) | Datos de un personaje (solo lectura) |
 | Datos | `PersonajeRepositorio` (`@Repository`) | La lista en memoria de la UD1 |
 | Lógica | `PersonajeServicio` (`@Service`) | Filtrar, ordenar y limitar con **streams** |
 | Presentación | `PersonajeController` (`@Controller`) | Recibir el filtro, validarlo, llamar al servicio y elegir la vista |
