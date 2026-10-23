@@ -141,14 +141,6 @@ Dependencias:
 | Spring Boot DevTools | Recarga automática |
 | Lombok | `@Data`, constructores, `@Slf4j`... |
 
-**Ojo!!! En Spring Boot 4 la consola H2 ya no viene con la dependencia h2, hay que añadirla a mano**
-```
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-h2console</artifactId>
-</dependency>
-```
-
 Paquetes que vais a crear dentro de `es.daw.productosjdbc`: `model`, `dto`, `repository`, `service`, `controller`, `exception`, `config`.
 
 ---
