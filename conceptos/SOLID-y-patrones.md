@@ -96,9 +96,9 @@ public class ProductoService {
 }
 ```
 
-> `ProductoNoEncontradoException` es una clase tuya que extiende `RuntimeException`.
+> `ProductoNoEncontradoException` es una excepción propia que extiende `RuntimeException`.
 
-**Prueba rápida:** ¿el servicio usa `Model`, `HttpServletRequest` o `ResultSet`? Entonces mezcla capas.
+**Prueba rápida para comprobar si lo estás haciendo mal:** ¿el servicio usa `Model`, `HttpServletRequest` o `ResultSet`? Entonces mezcla capas.
 
 ---
 
