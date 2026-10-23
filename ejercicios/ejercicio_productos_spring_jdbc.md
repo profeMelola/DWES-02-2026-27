@@ -158,7 +158,7 @@ Paquetes que vais a crear dentro de `es.daw.productosjdbc`: `model`, `dto`, `rep
 spring.application.name=productosJdbc
 
 # --- Base de datos H2 en memoria ---
-spring.datasource.url=jdbc:h2:mem:logisticadb
+spring.datasource.url=jdbc:h2:mem:logisticadb;DB_CLOSE_DELAY=-1
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
 spring.datasource.password=
