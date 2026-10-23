@@ -137,6 +137,7 @@ Dependencias:
 | Validation | `@Valid`, `@NotBlank`, `@Positive`... |
 | JDBC API | `DataSource` (pool HikariCP) configurado por Spring |
 | H2 Database | Base de datos en memoria y consola `/h2-console` |
+| JDBC | Jdbc API
 | Spring Boot DevTools | Recarga automática |
 | Lombok | `@Data`, constructores, `@Slf4j`... |
 
@@ -237,6 +238,9 @@ INSERT INTO producto (nombre, precio, codigo_fabricante) VALUES ('Impresora HP L
 Arrancad la aplicación (aún dará 404 en `/`, es normal) y entrad en `http://localhost:8080/h2-console`:
 
 - **JDBC URL:** `jdbc:h2:mem:logisticadb` · **User:** `sa` · **Password:** vacía
+
+<img width="554" height="493" alt="imagen" src="https://github.com/user-attachments/assets/625d470c-8724-4fea-98b3-17a1ef53c1bc" />
+
 
 Ejecutad:
 
