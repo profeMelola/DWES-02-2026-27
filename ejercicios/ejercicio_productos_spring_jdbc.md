@@ -2,56 +2,6 @@
 
 ![alt text](image.png)
 
-## Así queda la aplicación
-
-| # | Vista | URL | Paso |
-|---|---|---|---|
-| 1 | [Portada](#1-portada) | `/` | [Paso 10](#paso-10-plantilla-común-y-portada) |
-| 2 | [Listado de productos](#2-listado-de-productos) | `/productos` | [Paso 11](#paso-11-listado-de-productos-read) |
-| 3 | [Alta de producto con errores de validación](#3-alta-de-producto-con-errores-de-validación) | `/productos/nuevo` → Guardar | [Paso 12](#paso-12-alta-y-edición-create--update) |
-| 4 | [Edición de producto](#4-edición-de-producto) | `/productos/editar/1` | [Paso 12](#paso-12-alta-y-edición-create--update) |
-| 5 | [Listado de fabricantes](#5-listado-de-fabricantes) | `/fabricantes` | [Paso 14](#paso-14-crud-de-fabricantes) |
-| 6 | [Alta de fabricante](#6-alta-de-fabricante) | `/fabricantes/nuevo` | [Paso 14](#paso-14-crud-de-fabricantes) |
-| 7 | [Página de error](#7-página-de-error) | `/productos/editar/999` | [Paso 9](#paso-9-errores-en-la-web) |
-
-### 1. Portada
-
-![Portada](img/01-portada.png)
-
-### 2. Listado de productos
-
-Tras dar de alta un producto: mensaje flash verde y columnas para editar y borrar.
-
-![Listado de productos](img/02-productos-lista.png)
-
-### 3. Alta de producto con errores de validación
-
-Formulario enviado vacío: `@Valid` + `BindingResult` devuelven los tres errores.
-
-![Alta de producto con errores](img/03-productos-nuevo-errores.png)
-
-### 4. Edición de producto
-
-Mismo formulario que el alta, relleno con los datos del producto y su fabricante seleccionado.
-
-![Edición de producto](img/04-productos-editar.png)
-
-### 5. Listado de fabricantes
-
-Intento de borrar Asus, que tiene productos: el servicio lo impide y se muestra el aviso en rojo.
-
-![Listado de fabricantes](img/05-fabricantes-lista.png)
-
-### 6. Alta de fabricante
-
-![Alta de fabricante](img/06-fabricantes-nuevo.png)
-
-### 7. Página de error
-
-Código inexistente: `RecursoNoEncontradoException` → `GlobalExceptionHandler` → `error.html` (404).
-
-![Página de error](img/07-error-404.png)
-
 ---
 
 ## Contexto
@@ -119,7 +69,58 @@ erDiagram
 La clave ajena `codigo_fabricante` está en el lado **N** (producto). Consecuencia que veréis en la web: **no se puede borrar un fabricante que tenga productos**.
 
 ---
+## Así queda la aplicación
 
+| # | Vista | URL | Paso |
+|---|---|---|---|
+| 1 | [Portada](#1-portada) | `/` | [Paso 10](#paso-10-plantilla-común-y-portada) |
+| 2 | [Listado de productos](#2-listado-de-productos) | `/productos` | [Paso 11](#paso-11-listado-de-productos-read) |
+| 3 | [Alta de producto con errores de validación](#3-alta-de-producto-con-errores-de-validación) | `/productos/nuevo` → Guardar | [Paso 12](#paso-12-alta-y-edición-create--update) |
+| 4 | [Edición de producto](#4-edición-de-producto) | `/productos/editar/1` | [Paso 12](#paso-12-alta-y-edición-create--update) |
+| 5 | [Listado de fabricantes](#5-listado-de-fabricantes) | `/fabricantes` | [Paso 14](#paso-14-crud-de-fabricantes) |
+| 6 | [Alta de fabricante](#6-alta-de-fabricante) | `/fabricantes/nuevo` | [Paso 14](#paso-14-crud-de-fabricantes) |
+| 7 | [Página de error](#7-página-de-error) | `/productos/editar/999` | [Paso 9](#paso-9-errores-en-la-web) |
+
+### 1. Portada
+
+![Portada](img/01-portada.png)
+
+### 2. Listado de productos
+
+Tras dar de alta un producto: mensaje flash verde y columnas para editar y borrar.
+
+![Listado de productos](img/02-productos-lista.png)
+
+### 3. Alta de producto con errores de validación
+
+Formulario enviado vacío: `@Valid` + `BindingResult` devuelven los tres errores.
+
+![Alta de producto con errores](img/03-productos-nuevo-errores.png)
+
+### 4. Edición de producto
+
+Mismo formulario que el alta, relleno con los datos del producto y su fabricante seleccionado.
+
+![Edición de producto](img/04-productos-editar.png)
+
+### 5. Listado de fabricantes
+
+Intento de borrar Asus, que tiene productos: el servicio lo impide y se muestra el aviso en rojo.
+
+![Listado de fabricantes](img/05-fabricantes-lista.png)
+
+### 6. Alta de fabricante
+
+![Alta de fabricante](img/06-fabricantes-nuevo.png)
+
+### 7. Página de error
+
+Código inexistente: `RecursoNoEncontradoException` → `GlobalExceptionHandler` → `error.html` (404).
+
+![Página de error](img/07-error-404.png)
+
+
+---
 ## Paso 0. Crear el proyecto
 
 En IntelliJ → *New Project* → *Spring Boot*:
