@@ -1,7 +1,5 @@
 # SOLID y patrones de diseño en Spring MVC
 
-> **UT02 · RA5 · CE g:** *Se han aplicado los principios y patrones de diseño de la programación orientada a objetos.*
-
 ## 1. La idea en 30 segundos
 
 Un programa que funciona no es suficiente: tiene que poder **cambiarse sin romperse**. Los principios SOLID y los patrones son reglas que ya han demostrado ayudar a conseguirlo.
