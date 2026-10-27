@@ -22,6 +22,7 @@ En esta unidad damos el salto de Servlet/JSP a **Spring Boot + Spring MVC + Thym
 
 - [De Servlet/JSP a Spring MVC](./conceptos/de-servlet-a-spring-mvc.md)
 - [SOLID y Patrones](./conceptos/SOLID-y-patrones.md)
+- [Patron PRG](./conceptos/patron-PRG.md)
 
 ### Spring Boot ¿Qué es y cómo funciona?
 
