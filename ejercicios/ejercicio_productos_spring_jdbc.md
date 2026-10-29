@@ -1534,6 +1534,34 @@ public class FabricanteController {
 3. Regla de negocio nueva en el servicio: no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
 4. Reto de adaptación JDBC: añadid una columna stock INT NOT NULL a la tabla producto (en schema.sql y data.sql) y llevadla hasta la vista: modelo, repositorio (las 4 consultas y mapRow), formulario y listado. Anotad todos los sitios que habéis tenido que tocar.
 
+```sql
+CREATE TABLE producto (
+    codigo            INT          AUTO_INCREMENT PRIMARY KEY,
+    nombre            VARCHAR(100) NOT NULL,
+    precio            DOUBLE       NOT NULL,
+    stock             INT          NOT NULL,
+    codigo_fabricante INT          NOT NULL,
+    CONSTRAINT fk_producto_fabricante
+        FOREIGN KEY (codigo_fabricante) REFERENCES fabricante (codigo)
+);
+```
+
+```sql
+-- Productos
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Disco duro SATA3 1TB', 86.99, 25, 5);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Memoria RAM DDR4 8GB', 120, 40, 6);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Disco SSD 1 TB', 150.99, 15, 4);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('GeForce GTX 1050Ti', 185, 0, 7);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('GeForce GTX 1080 Xtreme', 755, 3, 6);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Monitor 24 LED Full HD', 202, 12, 1);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Monitor 27 LED Full HD', 245.99, 8, 1);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Portátil Yoga 520', 559, 5, 2);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Portátil Ideapd 320', 444, 0, 2);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Impresora HP Deskjet 3720', 59.99, 30, 3);
+INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Impresora HP Laserjet Pro M26nw', 180, 7, 3);
+```
+
+
 ## Parte 2 (UT04)
 
 Sobre este mismo proyecto sustituiremos `ProductoRepositoryJdbc` y `FabricanteRepositoryJdbc` por JPA (`@Entity`, `@ManyToOne`, `JpaRepository`). **Solo cambia la capa de repositorio**: servicios, controladores y vistas no deberían tocarse.
