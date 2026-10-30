@@ -1530,8 +1530,37 @@ public class FabricanteController {
 ## Retos opcionales
 
 1. Mostrar en el listado de fabricantes cuántos productos tiene cada uno (`LEFT JOIN` + `COUNT` + `GROUP BY`).
+
+---
+
 2. Añadir a `ProductoRepository` un método `findByFabricanteCodigo(Integer codigoFabricante)`, su método en el servicio y una página `/fabricantes/{codigo}/productos`.
-3. Regla de negocio nueva en el servicio: no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
+
+--- 
+
+3. **Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
+
+**Pistas:**
+
+Para crear:
+
+```sql
+SELECT 1 FROM fabricante WHERE LOWER(nombre) = LOWER(?)
+```
+
+Para editar (excluyendo al propio fabricante):
+
+```sql
+SELECT 1 FROM fabricante WHERE LOWER(nombre) = LOWER(?) AND codigo <> ?
+```
+
+Excepción propia `exception/FabricanteDuplicadoException.java`
+
+
+Métodos en la interface: 
+- existsByNombreIgnoreCase
+- existsByNombreIgnoreCaseAndCodigoNot
+
+--- 
 4. **(Empezar por este)** Reto de adaptación JDBC: añadid una columna stock INT NOT NULL a la tabla producto (en schema.sql y data.sql) y llevadla hasta la vista: modelo, repositorio (las 4 consultas y mapRow), formulario y listado. Anotad todos los sitios que habéis tenido que tocar.
 
 ```sql
