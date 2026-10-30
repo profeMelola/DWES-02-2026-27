@@ -1,6 +1,8 @@
 # Patrón PRG (Post / Redirect / Get)
 
-PRG significa **Post / Redirect / Get**. Es la forma de terminar un `POST` que ha modificado datos: en vez de devolver una página directamente, se manda al navegador a otra URL que se pide con `GET`.
+El patrón PRG (Post/Redirect/Get) es un patrón de diseño en el desarrollo web que evita que los formularios se envíen por duplicado cuando un usuario recarga la página o pulsa el botón "Atrás" del navegador
+
+Es la forma de terminar un `POST` que ha modificado datos: en vez de devolver una página directamente, se manda al navegador a otra URL que se pide con `GET`.
 
 En el proyecto ProductosJDBC se aplica en el endpoint `POST /productos/guardar` de `ProductoController`:
 
