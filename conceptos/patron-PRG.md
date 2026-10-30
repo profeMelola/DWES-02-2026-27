@@ -82,8 +82,6 @@ redirectAttributes.addFlashAttribute("mensaje", "Producto creado con código " +
 3. La vista `lista` lo muestra con `${mensaje}`.
 4. Si haces F5 en el listado, el mensaje ya no aparece, porque solo dura una petición (de ahí el nombre "flash").
 
-> `addAttribute`, sin "Flash", haría algo distinto: lo pondría en la URL como parámetro (`/productos?mensaje=...`).
-
 ## ¿Y cuando hay errores de validación?
 
 ```java
