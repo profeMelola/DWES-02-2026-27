@@ -86,7 +86,7 @@ El ISBN se guarda como texto: no se opera con él y 13 dígitos no caben en un `
 No hace falta que sea idéntica. Las imágenes son orientativas y los datos, de ejemplo.
 
 | # | Vista | URL |
-|---|---|---|---|
+|---|---|---|
 | 1 | Portada | `/` |
 | 2 | Listado filtrado | `/libros?anioDesde=1960&anioHasta=1970` |
 | 3 | Filtro con rango no válido | `/libros?anioDesde=1970&anioHasta=1960` |
