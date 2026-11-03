@@ -6,4 +6,4 @@
 | 1b | [Alta de usuario v2: dto y validación](./alta-usuario-spring-validacion.md) |  `dto`, `@ModelAttribute`, `@Valid`, `BindingResult`, `th:field`/`th:errors`, `messages.properties`, `LocaleResolver` |
 | 2 | [Personajes de Springfield en Spring MVC (autónomo)](./simpsons-spring.md) | Migración completa: capas, DTO + `@Valid` con formulario GET, streams en el servicio |
 | 3 | [Productos JDBC](./ejercicio_productos_spring_jdbc.md) | LogísticaApp: Spring CRUD JDBC [Descarga el proyecto y trabaja offline](./producto-jdbc-ALUMNO.zip) |
-| 4 | [Biblioteca JDBC](./ejercicio_biblioteca_spring_jdbc.md.md) | BibliotecaApp: Spring CRUD JDBC|
+| 4 | [Biblioteca JDBC](./ejercicio_biblioteca_spring_jdbc.md) | BibliotecaApp: Spring CRUD JDBC|
