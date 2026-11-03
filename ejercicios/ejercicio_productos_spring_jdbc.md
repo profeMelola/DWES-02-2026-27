@@ -1537,7 +1537,7 @@ public class FabricanteController {
 
 --- 
 
-3. **RETO 3:** Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
+3. **RETO 3: Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
 
 **Pistas:**
 
