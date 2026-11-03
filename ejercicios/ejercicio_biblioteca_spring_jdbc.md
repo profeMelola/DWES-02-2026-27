@@ -195,11 +195,6 @@ Las dos tablas tienen `id`, así que necesitaréis alias en el `SELECT`, igual q
 
 Partiendo de vuestro `layout.html` y `estilos.css`, generad los fragmentos `head`, `navbar`, `alertas` y `scripts` para Biblioteca, junto con `index.html` y `error.html`.
 
-
-### ✅ Comprobación
-
-Se ven la portada y la barra de navegación. Los enlaces aún no funcionan: `error.html` lo probaréis en el hito 6.
-
 ---
 
 ## Hito 6. CRUD de autores
