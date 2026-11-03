@@ -70,7 +70,7 @@ erDiagram
     }
 ```
 
-Todas las columnas son obligatorias. Fijaos en el `o{`: una FK no puede obligar a que un autor tenga libros, y además hay que dar de alta al autor **antes** que sus libros. Por eso puede existir un autor con cero libros.
+Todas las columnas son obligatorias. Una FK no puede obligar a que un autor tenga libros, y además hay que dar de alta al autor **antes** que sus libros. Por eso puede existir un autor con cero libros.
 
 | Clave | Para qué | Quién la ve |
 |---|---|---|
