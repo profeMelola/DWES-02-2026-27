@@ -2,7 +2,7 @@
 
 ![Portada de BibliotecaApp](img/biblioteca/01-portada.png)
 
-> Esta vez **no hay solución guiada ni código que copiar**. Montáis el proyecto vosotros, desde cero, con la IA como profesora particular.
+> Esta vez **no hay solución guiada ni código que copiar**. Montáis el proyecto vosotros, desde cero, con apoyo de la IA.
 
 ---
 
