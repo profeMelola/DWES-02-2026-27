@@ -1529,15 +1529,81 @@ public class FabricanteController {
 
 ## Retos opcionales
 
-1. **RETO 1:** Mostrar en el listado de fabricantes cuántos productos tiene cada uno (`LEFT JOIN` + `COUNT` + `GROUP BY`).
+### 1. **RETO 1:** Mostrar en el listado de fabricantes cuántos productos tiene cada uno (`LEFT JOIN` + `COUNT` + `GROUP BY`).
+
+**Pistas:**
+
+La consulta SQL
+
+```sql
+SELECT f.codigo, f.nombre, COUNT(p.codigo) AS num_productos
+FROM fabricante f
+LEFT JOIN producto p ON p.codigo_fabricante = f.codigo
+GROUP BY f.codigo, f.nombre
+ORDER BY f.nombre
+```
+
+Cada parte tiene su motivo.
+
+#### `LEFT JOIN` y no `JOIN`
+
+Con un `JOIN` normal solo salen las filas que encuentran pareja en las dos tablas. Huawei y Xiaomi no tienen productos, así que **desaparecerían del listado**.
+
+Con `LEFT JOIN` se mantienen todas las filas de la tabla de la izquierda (`fabricante`). Cuando un fabricante no tiene productos, las columnas de `p` vienen a `NULL`.
+
+Este es el resultado intermedio, antes de agrupar (resumido):
+
+| f.codigo | f.nombre | p.codigo |
+|----------|----------|----------|
+| 1        | Asus     | 6        |
+| 1        | Asus     | 7        |
+| 2        | Lenovo   | 8        |
+| …        | …        | …        |
+| 8        | Huawei   | **NULL** |
+| 9        | Xiaomi   | **NULL** |
+
+#### `GROUP BY f.codigo, f.nombre`
+
+Junta en una sola fila todas las que tienen el mismo fabricante. Las funciones de agregado como `COUNT` se calculan por grupo.
+
+Toda columna del `SELECT` que no esté dentro de un agregado tiene que ir en el `GROUP BY`. Si quitas `f.nombre` del `GROUP BY`, H2 da error.
+
+#### `COUNT(p.codigo)` y no `COUNT(*)`
+
+Esta es la trampa típica:
+
+- `COUNT(*)` cuenta **filas**. Huawei tiene una fila (la de los `NULL`), así que daría **1**.
+- `COUNT(columna)` cuenta solo los valores **no nulos**. Para Huawei, `p.codigo` es `NULL`, así que da **0**, que es lo correcto.
+
 
 ---
 
-2. **RETO 2:**  Añadir a `ProductoRepository` un método `findByFabricanteCodigo(Integer codigoFabricante)`, su método en el servicio y una página `/fabricantes/{codigo}/productos`.
+### 2. **RETO 2:**  Añadir a `ProductoRepository` un método `findByFabricanteCodigo(Integer codigoFabricante)`, su método en el servicio y una página `/fabricantes/{codigo}/productos`.
+
+
+**Pistas:**
+
+Enlazar la página desde el listado de fabricantes. En `fabricantes/lista.html`, convierte el nombre del fabricante en un enlace:
+
+```html
+<td>
+    <a th:href="@{/fabricantes/{codigo}/productos(codigo=${f.codigo})}"
+       th:text="${f.nombre}">Nombre</a>
+</td>
+```
+
+`{codigo}` dentro de la URL es una variable de ruta, y `(codigo=${f.codigo})` le da el valor. Thymeleaf genera `/fabricantes/1/productos`.
+
+
+Listado de productos es parecida a `productos/lista.html`, con dos diferencias:
+
+- **Sin columna "Fabricante"**: todos los productos son del mismo y ya sale en el título.
+- **Sin botones de editar ni borrar**: es una página de consulta.
+
 
 --- 
 
-3. **RETO 3: Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
+### 3. **RETO 3: Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
 
 **Pistas:**
 
@@ -1561,7 +1627,7 @@ Métodos en la interface:
 - existsByNombreIgnoreCaseAndCodigoNot
 
 --- 
-4. **RETO 4 (Empezar por este) Reto de adaptación JDBC:** añadid una columna stock INT NOT NULL a la tabla producto (en schema.sql y data.sql) y llevadla hasta la vista: modelo, repositorio (las 4 consultas y mapRow), formulario y listado. Anotad todos los sitios que habéis tenido que tocar.
+### 4. **RETO 4 (Empezar por este) Reto de adaptación JDBC:** añadid una columna stock INT NOT NULL a la tabla producto (en schema.sql y data.sql) y llevadla hasta la vista: modelo, repositorio (las 4 consultas y mapRow), formulario y listado. Anotad todos los sitios que habéis tenido que tocar.
 
 ```sql
 CREATE TABLE producto (
