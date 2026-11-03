@@ -26,10 +26,10 @@ Hay cosas nuevas:
 | Parte | Quién la hace | Vuestra responsabilidad |
 |---|---|---|
 | `schema.sql` y `data.sql` | IA | Revisar la FK, el `ON DELETE CASCADE` y los datos |
-| HTML, Thymeleaf y CSS | IA | Entender **cada** `th:*`. Si no podéis explicar una línea, preguntad |
+| HTML y CSS | IA | No importa el diseño de la vista |
 | Modelo, repositorios, servicios, controladores, DTO, excepciones | **Vosotros** | La IA explica, da pistas y ayuda con los errores, pero no os escribe la clase |
 
-> **Recordad:** código que funciona pero no sigue los patrones de clase no vale. La IA no conoce nuestros patrones si no se los dais: pasadle vuestro código de LogísticaApp como referencia y revisad lo que genere con la [lista de control](#lista-de-control-la-ia-os-ha-sacado-de-los-patrones-de-clase).
+> **Recordad:** código que funciona pero no sigue los patrones de clase no vale.
 
 ---
 
