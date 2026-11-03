@@ -25,6 +25,9 @@ En esta unidad damos el salto de Servlet/JSP a **Spring Boot + Spring MVC + Thym
 - [Patron PRG](./conceptos/patron-PRG.md)
 - [Chuleta Thymeleaf](./conceptos/chuleta-thymeleaf.md)
 
+## Práctica
+[Ejercicios](./ejercicios/readme.md)
+
 ### Spring Boot ¿Qué es y cómo funciona?
 
 Spring Boot es una extensión del framework Spring cuya finalidad es simplificar la creación y configuración inicial de aplicaciones.
@@ -76,10 +79,6 @@ src/
 | `@Configuration` | Define beans / configuración | Configuración |
 
 > En esta unidad trabajamos con **`@Controller`**: el servidor genera el HTML (MPA). Los **`@RestController`** devuelven datos y los veremos en la UD3 (API REST).
-
-## Práctica
-
-[Ejercicios](./ejercicios/readme.md)
 
 
 ## Tutoriales de apoyo
