@@ -16,7 +16,7 @@ Hay cosas nuevas:
 |---|---|---|---|
 | **Borrar el padre** | Prohibido si tiene hijos (lo impide el servicio) | Se borran también sus libros (`ON DELETE CASCADE`) | La misma relación 1:N admite reglas opuestas. Quién hace cada trabajo: BD o Java |
 | **Tipo de dato** |  | `DATE` ↔ `LocalDate` | Recorrer una fecha por todas las capas: BD, JDBC, formulario y vista |
-| **Identificador** | `codigo`, interno y visible a la vez | `id` interno que el usuario nunca ve + `isbn` público y único | Distinguir la clave técnica de la clave de negocio |
+| **Identificador** | `codigo`, interno y visible a la vez (id autoincrement) | `id` interno autoincrement que el usuario nunca ve + `isbn` público y único | Distinguir la clave técnica de la clave de negocio |
 | **Consulta** | SQL fijo | SQL dinámico según los filtros rellenos | Montar el SQL en tiempo de ejecución **sin concatenar valores** |
 
 ## Cómo se usa la IA en este ejercicio
