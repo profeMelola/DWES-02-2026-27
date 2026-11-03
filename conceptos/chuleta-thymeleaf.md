@@ -246,7 +246,6 @@ Si la lista está vacía, `th:each` no genera ninguna fila y la tabla se queda s
 <tr th:each="p : ${productos}"> ... </tr>
 ```
 
-Son dos `<tr>` distintos porque, en una misma etiqueta, `th:each` se ejecuta antes que `th:if`. Si la lista está vacía, no se repite la etiqueta y el `th:if` nunca llega a evaluarse.
 ---
 
 ## 7. Fragmentos (`fragments/layout.html`)
