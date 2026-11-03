@@ -1529,15 +1529,15 @@ public class FabricanteController {
 
 ## Retos opcionales
 
-1. Mostrar en el listado de fabricantes cuántos productos tiene cada uno (`LEFT JOIN` + `COUNT` + `GROUP BY`).
+1. **RETO 1:** Mostrar en el listado de fabricantes cuántos productos tiene cada uno (`LEFT JOIN` + `COUNT` + `GROUP BY`).
 
 ---
 
-2. Añadir a `ProductoRepository` un método `findByFabricanteCodigo(Integer codigoFabricante)`, su método en el servicio y una página `/fabricantes/{codigo}/productos`.
+2. **RETO 2:**  Añadir a `ProductoRepository` un método `findByFabricanteCodigo(Integer codigoFabricante)`, su método en el servicio y una página `/fabricantes/{codigo}/productos`.
 
 --- 
 
-3. **Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
+3. **RETO 3:** Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
 
 **Pistas:**
 
@@ -1561,7 +1561,7 @@ Métodos en la interface:
 - existsByNombreIgnoreCaseAndCodigoNot
 
 --- 
-4. **(Empezar por este)** Reto de adaptación JDBC: añadid una columna stock INT NOT NULL a la tabla producto (en schema.sql y data.sql) y llevadla hasta la vista: modelo, repositorio (las 4 consultas y mapRow), formulario y listado. Anotad todos los sitios que habéis tenido que tocar.
+4. **RETO 4 (Empezar por este) Reto de adaptación JDBC:** añadid una columna stock INT NOT NULL a la tabla producto (en schema.sql y data.sql) y llevadla hasta la vista: modelo, repositorio (las 4 consultas y mapRow), formulario y listado. Anotad todos los sitios que habéis tenido que tocar.
 
 ```sql
 CREATE TABLE producto (
@@ -1591,6 +1591,8 @@ INSERT INTO producto (nombre, precio, stock, codigo_fabricante) VALUES ('Impreso
 ```
 
 
-## Parte 2 (UT04)
+---
+
+## Parte 2 (UT04). 2ª evaluación. Próximamente...
 
 Sobre este mismo proyecto sustituiremos `ProductoRepositoryJdbc` y `FabricanteRepositoryJdbc` por JPA (`@Entity`, `@ManyToOne`, `JpaRepository`). **Solo cambia la capa de repositorio**: servicios, controladores y vistas no deberían tocarse.
