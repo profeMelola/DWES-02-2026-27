@@ -10,12 +10,12 @@
 
 Vais a desarrollar **BibliotecaApp**, una aplicación web que gestiona el catálogo de una biblioteca: **autores** y **libros** (con fecha de publicación). Permite listar, crear, actualizar, borrar y filtrar. La arquitectura es la de LogísticaApp: `@Controller` → `@Service` → `Repository` (interfaz) → `RepositoryJdbc` → H2.
 
-No es repetir la práctica cambiando nombres. Hay cuatro cosas nuevas:
+Hay cosas nuevas:
 
 | | LogísticaApp | BibliotecaApp | Qué aprendéis |
 |---|---|---|---|
 | **Borrar el padre** | Prohibido si tiene hijos (lo impide el servicio) | Se borran también sus libros (`ON DELETE CASCADE`) | La misma relación 1:N admite reglas opuestas. Quién hace cada trabajo: BD o Java |
-| **Tipo de dato** | `DOUBLE` | `DATE` ↔ `LocalDate` | Recorrer una fecha por todas las capas: BD, JDBC, formulario y vista |
+| **Tipo de dato** |  | `DATE` ↔ `LocalDate` | Recorrer una fecha por todas las capas: BD, JDBC, formulario y vista |
 | **Identificador** | `codigo`, interno y visible a la vez | `id` interno que el usuario nunca ve + `isbn` público y único | Distinguir la clave técnica de la clave de negocio |
 | **Consulta** | SQL fijo | SQL dinámico según los filtros rellenos | Montar el SQL en tiempo de ejecución **sin concatenar valores** |
 
