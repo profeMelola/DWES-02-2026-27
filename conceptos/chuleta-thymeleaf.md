@@ -97,23 +97,147 @@ Ojo: es `#lists`, en **plural**.
 
 ## 6. Bucles: `th:each` y variable de estado
 
+`th:each` funciona como un `for-each` de Java: **repite la etiqueta en la que está**, incluido su contenido, una vez por cada elemento de la lista.
+
+```java
+// Controlador
+model.addAttribute("productos", productoService.listar());
+```
+
 ```html
-<tr th:each="p, st : ${productos}">
-    <td th:text="${st.count}">1</td>          <!-- 1, 2, 3... -->
+<!-- Plantilla -->
+<tr th:each="p : ${productos}">
     <td th:text="${p.nombre}">Nombre</td>
 </tr>
 ```
 
-| Propiedad de `st` | Valor |
-|---|---|
-| `index` / `count` | Posición desde 0 / desde 1 |
-| `size` | Total de elementos |
-| `first` / `last` | `true` en el primero / el último |
-| `even` / `odd` | Fila par / impar |
+```html
+<!-- HTML generado si hay 3 productos -->
+<tr><td>Teclado</td></tr>
+<tr><td>Ratón</td></tr>
+<tr><td>Monitor</td></tr>
+```
 
-Si no declaras la variable de estado, existe igualmente con el nombre `pStat` (variable + `Stat`).
+- `p` es el elemento de cada vuelta. El nombre lo eliges tú.
+- `${productos}` es la lista que llega del modelo.
+- `p` solo existe dentro de la etiqueta que lleva `th:each`.
+- Si quieres repetir filas, `th:each` va en el `<tr>`, no en el `<table>`.
 
-**Patrón "lista vacía"** (`productos/lista.html`):
+### Variable de estado
+
+Sirve para saber **en qué vuelta del bucle estamos**. Se declara después del elemento, separada por una coma. Aquí se llama `st`, pero puede tener otro nombre:
+
+```html
+<tr th:each="p, st : ${productos}">
+    <td th:text="${st.count}">1</td>
+    <td th:text="${p.nombre}">Nombre</td>
+</tr>
+```
+
+Estos son sus valores con una lista de 3 productos:
+
+| `p.nombre` | `st.index` | `st.count` | `st.size` | `st.first` | `st.last` | `st.even` | `st.odd` |
+|------------|------------|------------|-----------|------------|-----------|-----------|----------|
+| Teclado    | 0          | 1          | 3         | `true`     | `false`   | `false`   | `true`   |
+| Ratón      | 1          | 2          | 3         | `false`    | `false`   | `true`    | `false`  |
+| Monitor    | 2          | 3          | 3         | `false`    | `true`    | `false`   | `true`   |
+
+| Propiedad         | Valor                                 |
+|-------------------|---------------------------------------|
+| `index`           | Posición contando desde 0             |
+| `count`           | Posición contando desde 1             |
+| `size`            | Total de elementos                    |
+| `first` / `last`  | `true` en el primero / en el último   |
+| `even` / `odd`    | `true` si `count` es par / impar      |
+
+Ojo: `even` y `odd` dependen de `count`, no de `index`. Por eso la primera fila es impar (`odd`).
+
+### Variable de estado implícita: `pStat`
+
+Si no declaras la variable de estado, Thymeleaf la crea igualmente. Su nombre es el de la variable del bucle seguido de `Stat`:
+
+```html
+<!-- No declaramos st: usamos pStat directamente -->
+<tr th:each="p : ${productos}">
+    <td th:text="${pStat.count}">1</td>
+    <td th:text="${p.nombre}">Nombre</td>
+</tr>
+```
+
+| `th:each`                         | Variable de estado |
+|-----------------------------------|--------------------|
+| `p : ${productos}`                | `pStat`            |
+| `f : ${fabricantes}`              | `fStat`            |
+| `producto : ${productos}`         | `productoStat`     |
+| `p, st : ${productos}`            | `st` (no `pStat`)  |
+
+### Ejemplos
+
+**Mostrar la posición y el total:**
+
+```html
+<p th:each="p, st : ${productos}"
+   th:text="|Producto ${st.count} de ${st.size}: ${p.nombre}|">Producto</p>
+```
+
+Resultado: `Producto 1 de 3: Teclado`.
+
+**Colorear las filas impares con `pStat`:**
+
+```html
+<tr th:each="p : ${productos}"
+    th:classappend="${pStat.odd} ? 'table-secondary'">
+    <td th:text="${p.nombre}">Nombre</td>
+</tr>
+```
+
+La variable de estado ya se puede usar en la misma etiqueta que lleva `th:each`.
+
+**Destacar el primer elemento:**
+
+```html
+<li th:each="p, st : ${productos}">
+    <span th:text="${p.nombre}">Nombre</span>
+    <strong th:if="${st.first}">(primero de la lista)</strong>
+</li>
+```
+
+**Separar con comas, sin coma al final:**
+
+```html
+<span th:each="f : ${fabricantes}">
+    <span th:text="${f.nombre}">Fabricante</span><span th:unless="${fStat.last}">, </span>
+</span>
+```
+
+Resultado: `Acme, Bosch, Makita`.
+
+### Tamaño de la lista
+
+| Expresión                   | Dónde se puede usar                                              |
+|-----------------------------|------------------------------------------------------------------|
+| `${st.size}`                | Solo dentro del `th:each`, porque `st` no existe fuera del bucle |
+| `${productos.size()}`       | En cualquier parte de la plantilla                               |
+| `${#lists.size(productos)}` | En cualquier parte de la plantilla                               |
+
+Las dos últimas leen directamente la lista del modelo, así que no dependen del bucle:
+
+```html
+<!-- Fuera del bucle: st no existe -->
+<p th:text="|Total: ${productos.size()} productos|">Total</p>
+<p th:text="|Total: ${#lists.size(productos)} productos|">Total</p>
+
+<!-- Dentro del bucle: las tres opciones dan el mismo resultado -->
+<tr th:each="p, st : ${productos}">
+    <td th:text="|${st.count} de ${st.size}|">1 de 3</td>
+    <td th:text="|${st.count} de ${productos.size()}|">1 de 3</td>
+    <td th:text="|${st.count} de ${#lists.size(productos)}|">1 de 3</td>
+</tr>
+```
+
+### Patrón "lista vacía" (`productos/lista.html`)
+
+Si la lista está vacía, `th:each` no genera ninguna fila y la tabla se queda sin datos. Para mostrar un aviso, se añade una fila aparte:
 
 ```html
 <tr th:if="${#lists.isEmpty(productos)}">
@@ -122,6 +246,7 @@ Si no declaras la variable de estado, existe igualmente con el nombre `pStat` (v
 <tr th:each="p : ${productos}"> ... </tr>
 ```
 
+Son dos `<tr>` distintos porque, en una misma etiqueta, `th:each` se ejecuta antes que `th:if`. Si la lista está vacía, no se repite la etiqueta y el `th:if` nunca llega a evaluarse.
 ---
 
 ## 7. Fragmentos (`fragments/layout.html`)
@@ -263,15 +388,4 @@ Spring Boot usa `templates/error.html` para los errores no controlados y le pasa
 | `<!-- ... -->` | Comentario HTML normal: llega al navegador |
 | `<!--/* ... */-->` | Comentario de Thymeleaf: se **elimina** al procesar la plantilla |
 
----
 
-## 13. Errores típicos en el examen
-
-- `#list` en lugar de `#lists`.
-- Comillas dobles dentro de un `th:` que ya va entre dobles: usa simples, `'texto'`.
-- Olvidar `th:` (`href="@{...}"` no se procesa).
-- `th:object` con un objeto que no está en el modelo → error `Neither BindingResult nor plain target object...`.
-- Hacer `redirect` cuando hay errores de validación: se pierden los errores y lo que había escrito el usuario.
-- No recargar en el modelo las listas del desplegable al volver al formulario con errores.
-- Usar `<` o `>` en una expresión: mejor `lt` o `gt`.
-- Olvidar `~{...}` en `th:replace`: funciona, pero está obsoleto.
