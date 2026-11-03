@@ -259,17 +259,9 @@ Requisitos:
 - `anioHasta < anioDesde` se comprueba en el controlador y se añade con `rejectValue`.
 - Enlace **Limpiar** que vuelve a `/libros`.
 
-**Pista para `buscar`.** Son ocho combinaciones de filtros y no vais a escribir ocho consultas:
+**Pista para `buscar`.** Son ocho combinaciones de filtros y no vais a escribir ocho consultas...
 
-| Parte | Idea |
-|---|---|
-| Base | `SELECT` con `JOIN` más `WHERE 1=1`: cualquier filtro puede empezar por `AND` |
-| Texto | `StringBuilder`. Por cada filtro no nulo, se añade su `AND ... ?` |
-| Valores | Se guardan en una `List<Object>` en el mismo orden que los `?` |
-| Año | `EXTRACT(YEAR FROM l.fecha_publicacion) >= ?` |
-| Parámetros | Un bucle con `ps.setObject(i + 1, valores.get(i))` |
 
-> Lo que se concatena son **trozos de SQL fijos escritos por vosotros**. Los valores del usuario van siempre por `?`.
 
 
 ---
