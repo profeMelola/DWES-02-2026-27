@@ -85,13 +85,13 @@ El ISBN se guarda como texto: no se opera con él y 13 dígitos no caben en un `
 
 No hace falta que sea idéntica. Las imágenes son orientativas y los datos, de ejemplo.
 
-| # | Vista | URL | Hito |
+| # | Vista | URL |
 |---|---|---|---|
-| 1 | Portada | `/` | [Hito 5](#hito-5-plantilla-común-portada-y-errores-con-ia) |
-| 2 | Listado filtrado | `/libros?anioDesde=1960&anioHasta=1970` | [Hito 8](#hito-8-filtro-de-libros) |
-| 3 | Filtro con rango no válido | `/libros?anioDesde=1970&anioHasta=1960` | [Hito 8](#hito-8-filtro-de-libros) |
-| 4 | Alta con errores de validación | `/libros/nuevo` → Guardar | [Hito 7](#hito-7-crud-de-libros) |
-| 5 | Autor borrado en cascada | `/autores` | [Hito 6](#hito-6-crud-de-autores) |
+| 1 | Portada | `/` |
+| 2 | Listado filtrado | `/libros?anioDesde=1960&anioHasta=1970` |
+| 3 | Filtro con rango no válido | `/libros?anioDesde=1970&anioHasta=1960` |
+| 4 | Alta con errores de validación | `/libros/nuevo` → Guardar |
+| 5 | Autor borrado en cascada | `/autores` |
 
 ### Listado filtrado
 
