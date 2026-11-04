@@ -2,7 +2,7 @@
 
 ![Portada de BibliotecaApp](img/biblioteca/01-portada.png)
 
-> > **No hay solución guiada.** Si queréis practicar, montad el proyecto desde cero, con apoyo de la IA. El viernes 6 de noviembre se entrega el proyecto completo.
+>  **No hay solución guiada.** Si queréis practicar, montad el proyecto desde cero, con apoyo de la IA. El viernes 6 de noviembre se entrega el proyecto completo.
 
 ---
 
