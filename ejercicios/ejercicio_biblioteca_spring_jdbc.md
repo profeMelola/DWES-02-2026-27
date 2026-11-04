@@ -26,7 +26,7 @@ Hay cosas nuevas:
 |---|---|---|
 | `schema.sql` y `data.sql` | IA | Revisar la FK, el `ON DELETE CASCADE` y los datos |
 | HTML y CSS | IA | No importa el diseño de la vista |
-| Modelo, repositorios, servicios, controladores, DTO, excepciones | **Vosotros** | La IA explica, da pistas y ayuda con los errores, pero no os escribe la clase |
+| Modelo, DTO, mappers, repositorios, servicios, controladores, excepciones | **Vosotros** | La IA explica, da pistas y ayuda con los errores, pero no os escribe la clase |
 
 > **Recordad:** código que funciona pero no sigue los patrones de clase no vale.
 
@@ -136,13 +136,15 @@ La IA puede **inventarse fechas e ISBN**. Para la práctica da igual, pero compr
 
 ---
 
-## Hito 2. Modelo, interfaces y excepciones
+## Hito 2. Modelo, DTO, mappers, interfaces y excepciones
 
 Reutilizad el diseño de LogísticaApp, pero escribidlo vosotros, sin copiar y pegar.
 
 | Paquete | Clases | Qué tener en cuenta |
 |---|---|---|
-| `model` | `Autor`, `Libro` | POJO sin anotaciones de persistencia. `Libro` guarda su `id`, su `isbn` y un objeto `Autor`, no un `autorId`. La fecha es `LocalDate` |
+| `model` | `Autor`, `Libro` | POJO sin anotaciones de persistencia ni de validación. `Libro` guarda su `id`, su `isbn` y un objeto `Autor`, no un `autorId`. La fecha es `LocalDate` |
+| `dto` | `AutorDto`, `LibroDto`, `FiltroLibrosDto` | Clases con Lombok entre la vista y el controlador. Las validaciones van aquí, no en `model` |
+| `mapper` | `AutorMapper`, `LibroMapper` | `@Component` con `toDto` y `toModelEntity`. Solo convierten: no usan servicios ni repositorios. Los usa el controlador |
 | `repository` | `GenericRepository<T, ID>`, `AutorRepository`, `LibroRepository` | Sin `SQLException` en las interfaces |
 | `exception` | `AccesoDatosException`, `RecursoNoEncontradoException`, `IsbnDuplicadoException`, `GlobalExceptionHandler` | **No** hay equivalente a `FabricanteConProductosException`. ¿Por qué? |
 
@@ -190,13 +192,15 @@ Las dos tablas tienen `id`, así que necesitaréis alias en el `SELECT`, igual q
 
 Partiendo de vuestro `layout.html` y `estilos.css`, generad los fragmentos `head`, `navbar`, `alertas` y `scripts` para Biblioteca, junto con `index.html` y `error.html`.
 
+Bootstrap y Bootstrap Icons van en local, dentro de `static/vendor`, para que la aplicación funcione sin internet.
+
 ---
 
 ## Hito 6. CRUD de autores
 
 Primero los autores: sin ellos no hay `<select>` en el formulario de libros.
 
-Escribid `AutorController`. Las vistas `autores/lista.html` y `autores/formulario.html` pueden salir de la IA, siempre con **vuestro controlador y vuestro modelo** como referencia, para que use los mismos nombres.
+Escribid `AutorController`, que trabaja con `AutorDto` hacia la vista y con `Autor` hacia el servicio, usando `AutorMapper`. Las vistas `autores/lista.html` y `autores/formulario.html` pueden salir de la IA, siempre con **vuestro controlador y vuestro modelo** como referencia, para que use los mismos nombres.
 
 Requisitos de las vistas:
 
@@ -208,17 +212,18 @@ Requisitos de las vistas:
 
 ## Hito 7. CRUD de libros
 
-Un formulario único para alta y edición, con `LibroForm` (clase con Lombok) en el paquete `dto`.
+Un formulario único para alta y edición, con `LibroDto` (clase con Lombok) en el paquete `dto`.
 
 | Campo | Tipo | Validación |
 |---|---|---|
-| `isbn` | `String` | Obligatorio. Exactamente 13 dígitos (`@Pattern`) |
+| `isbn` | `String` | Obligatorio. Exactamente 13 dígitos (`@NotNull` + `@Pattern`, para que un campo vacío dé un solo error) |
 | `edicion` | `boolean` | Campo oculto: `false` = alta, `true` = edición |
 | `titulo` | `String` | Obligatorio. Máximo 150 caracteres |
 | `autorId` | `Integer` | Obligatorio |
+| `autorNombre` | `String` | Solo para mostrar en el listado. No se valida |
 | `fechaPublicacion` | `LocalDate` | Obligatoria. No puede ser futura (`@PastOrPresent`) |
 
-`LibroForm` **no lleva `id`**: ni el formulario ni la URL lo publican.
+`LibroDto` **no lleva `id`**: ni la vista ni la URL lo publican. El controlador convierte con `LibroMapper`, y los servicios trabajan con `Libro`.
 
 Requisitos:
 
@@ -251,6 +256,7 @@ Requisitos:
 - Se muestra cuántos libros se han encontrado o, si no hay ninguno, un mensaje en lugar de la tabla vacía.
 - Con errores de validación, no se muestra la tabla.
 - `anioHasta < anioDesde` se comprueba en el controlador y se añade con `rejectValue`.
+- Desde y Hasta son `<input type="text">`. Con `type="number"`, el navegador envía vacío un texto no válido y el servidor no ve el error.
 - Enlace **Limpiar** que vuelve a `/libros`.
 
 **Pista para `buscar`.** Un `filter` por cada criterio, que deje pasar todo si el valor es `null`. El año se obtiene con `getFechaPublicacion().getYear()`.
