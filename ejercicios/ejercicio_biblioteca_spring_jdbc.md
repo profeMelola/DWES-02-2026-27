@@ -17,7 +17,6 @@ Hay cosas nuevas:
 | **Borrar el padre** | Prohibido si tiene hijos (lo impide el servicio) | Se borran también sus libros (`ON DELETE CASCADE`) | La misma relación 1:N admite reglas opuestas. Quién hace cada trabajo: BD o Java |
 | **Tipo de dato** |  | `DATE` ↔ `LocalDate` | Recorrer una fecha por todas las capas: BD, JDBC, formulario y vista |
 | **Identificador** | `codigo`, interno y visible a la vez (id autoincrement) | `id` interno autoincrement que el usuario nunca ve + `isbn` público y único | Distinguir la clave técnica de la clave de negocio |
-| **Consulta** | SQL fijo | SQL dinámico según los filtros rellenos | Montar el SQL en tiempo de ejecución **sin concatenar valores** |
 
 ## Cómo se usa la IA en este ejercicio
 
@@ -147,15 +146,12 @@ Reutilizad el diseño de LogísticaApp, pero escribidlo vosotros, sin copiar y p
 | `repository` | `GenericRepository<T, ID>`, `AutorRepository`, `LibroRepository` | Sin `SQLException` en las interfaces |
 | `exception` | `AccesoDatosException`, `RecursoNoEncontradoException`, `IsbnDuplicadoException`, `GlobalExceptionHandler` | **No** hay equivalente a `FabricanteConProductosException`. ¿Por qué? |
 
-`LibroRepository` añade al CRUD estas tres operaciones:
+`LibroRepository` añade al CRUD estas dos operaciones:
 
 ```java
 Optional<Libro> findByIsbn(String isbn);
 
 int countByAutorId(Integer autorId);
-
-/** Cada parámetro es opcional: si llega null, ese filtro no se aplica. */
-List<Libro> buscar(Integer autorId, Integer anioDesde, Integer anioHasta);
 ```
 
 ---
@@ -163,8 +159,6 @@ List<Libro> buscar(Integer autorId, Integer anioDesde, Integer anioHasta);
 ## Hito 3. Repositorios JDBC
 
 Mismas reglas que en LogísticaApp: `PreparedStatement`, `try-with-resources`, `Optional` en `findById`, `RETURN_GENERATED_KEYS` en `save` y toda `SQLException` convertida en `AccesoDatosException`.
-
-Dejad `buscar` para el hito 8. Por ahora, implementad el resto.
 
 **Lo nuevo es la fecha:**
 
@@ -181,6 +175,7 @@ Las dos tablas tienen `id`, así que necesitaréis alias en el `SELECT`, igual q
 
 | Servicio | Regla |
 |---|---|
+| `LibroService.buscar` | Filtra con streams sobre `findAll()`. Cada filtro es opcional: si llega `null`, no se aplica |
 | `LibroService.buscarPorIsbn` | Si no existe, `RecursoNoEncontradoException` |
 | `LibroService.crear` | Si el ISBN ya existe, `IsbnDuplicadoException`. Si el autor no existe, `RecursoNoEncontradoException`. El título se guarda sin espacios sobrantes |
 | `LibroService.actualizar` y `borrar` | Reciben datos con ISBN y **sin `id`**: localizan el libro por ISBN y usan su `id` para llamar al repositorio. El ISBN no se modifica |
@@ -241,7 +236,7 @@ Requisitos:
 
 ## Hito 8. Filtro de libros
 
-`GET /libros` muestra el formulario de filtros y la tabla en la misma vista. Es el mismo planteamiento que los [Personajes de Springfield](./simpsons-spring.md), pero ahora el filtro lo resuelve **el SQL**, no un stream.
+`GET /libros` muestra el formulario de filtros y la tabla en la misma vista. Es el mismo planteamiento que los [Personajes de Springfield](./simpsons-spring.md), y el filtro se resuelve **en Java**: en `LibroService`, con streams sobre `findAll()`.
 
 | Campo de `FiltroLibrosDto` | Tipo | Validación |
 |---|---|---|
@@ -252,13 +247,13 @@ Requisitos:
 Requisitos:
 
 - El formulario va por **GET** y conserva los valores tras buscar.
-- Resultados ordenados por fecha, del más reciente al más antiguo.
+- Resultados ordenados por fecha, del más reciente al más antiguo. El orden lo da el `ORDER BY` de `findAll()`.
 - Se muestra cuántos libros se han encontrado o, si no hay ninguno, un mensaje en lugar de la tabla vacía.
 - Con errores de validación, no se muestra la tabla.
 - `anioHasta < anioDesde` se comprueba en el controlador y se añade con `rejectValue`.
 - Enlace **Limpiar** que vuelve a `/libros`.
 
-**Pista para `buscar`.** Son ocho combinaciones de filtros y no vais a escribir ocho consultas...
+**Pista para `buscar`.** Un `filter` por cada criterio, que deje pasar todo si el valor es `null`. El año se obtiene con `getFechaPublicacion().getYear()`.
 
 ---
 
