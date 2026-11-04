@@ -306,6 +306,25 @@ Requisitos:
 
 ---
 
+## 📌 Conceptos nuevos
+
+Lo que no aparece en LogísticaApp, por orden de prioridad.
+
+| # | Concepto | Explicación | Dónde verlo |
+|---|---|---|---|
+| 1 | **Mappers con `@Component`** | Bean que convierte entre DTO y `model` con `toDto` y `toModelEntity`. Solo convierte, y lo usa el controlador | `AutorMapper`, `LibroMapper`, controladores |
+| 2 | **Borrado en cascada** | La BD borra los libros del autor. Java solo borra el autor, y cuenta los libros antes para el mensaje | `schema.sql`, `AutorService.borrar` |
+| 3 | **`LocalDate`** | Recorrido de la fecha: `DATE`, `setObject`/`getObject`, `@DateTimeFormat`, `<input type="date">` y `#temporals.format` | `schema.sql`, `LibroRepositoryJdbc`, `LibroDto`, vistas de libros |
+| 4 | **Clave técnica y de negocio** | `id` interno y `isbn` público y único. Se localiza por ISBN y se usa el `id` en el repositorio | `schema.sql`, `LibroService`, `LibroDto` |
+| 5 | **Validación cruzada** | Comparar dos campos en el controlador y añadir el error con `rejectValue` | `LibroController.listar`, `messages.properties` |
+| 6 | **Campo oculto `edicion`** | Distingue alta de edición, porque `LibroDto` no lleva `id` | `LibroDto`, `LibroController.guardar` |
+| 7 | **`readonly` y `disabled`** | El ISBN se bloquea con `readonly`, porque un campo `disabled` no se envía | `libros/formulario.html` |
+| 8 | **`@NotNull` + `@Pattern`** | Evita dos errores en un campo vacío, que saldrían con `@NotBlank` + `@Pattern` | `LibroDto` |
+| 9 | **`typeMismatch`** | Mensaje propio cuando Spring no puede convertir un dato. Por eso el filtro usa `type="text"` | `messages.properties`, `libros/lista.html` |
+| 10 | **Bootstrap local** | CSS, JS e iconos dentro del proyecto para funcionar sin internet | `static/vendor`, `fragments/layout.html` |
+| 11 | **`th:block`** | Agrupa varios elementos para aplicarles un `th:if` o un `th:each`, sin añadir ninguna etiqueta al HTML final | `libros/lista.html` |
+
+---
 
 
 [← Volver a ejercicios](./readme.md)
