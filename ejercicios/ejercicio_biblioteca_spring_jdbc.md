@@ -260,7 +260,47 @@ Requisitos:
 
 **Pista para `buscar`.** Son ocho combinaciones de filtros y no vais a escribir ocho consultas...
 
+---
 
+## ✅ Pruebas de funcionamiento
+
+### Autores
+
+| Prueba | Resultado esperado |
+|---|---|
+| `/autores` | Listado por orden alfabético, sin columna Id |
+| Alta con el nombre vacío | Error junto al campo |
+| Alta correcta y F5 en el listado | Mensaje verde y sin duplicados |
+| Editar un autor | El formulario llega relleno y guarda el cambio |
+| Borrar un autor con libros | Aviso de confirmación y mensaje "...borrado junto con N libros" |
+| En `/h2-console`, buscar libros de ese `autor_id` | 0 filas |
+| Borrar un autor sin libros | Mensaje "...borrado junto con 0 libros" |
+
+### Libros
+
+| Prueba | Resultado esperado |
+|---|---|
+| `/libros` | Listado del más reciente al más antiguo, con fecha `dd/MM/yyyy` |
+| Guardar vacío | Cuatro errores en rojo |
+| ISBN con letras o con 12 dígitos | Un solo error, de formato |
+| ISBN que ya existe | Error junto al ISBN, sin perder el resto de datos |
+| Fecha futura | Error en la fecha |
+| Alta correcta y F5 en el listado | Mensaje verde y sin duplicados |
+| Editar un libro | La URL lleva el ISBN. El ISBN aparece bloqueado, con su autor seleccionado y su fecha rellena |
+| Borrar un libro | Aviso de confirmación y mensaje verde |
+
+### Filtro de libros
+
+| Prueba | Resultado esperado |
+|---|---|
+| `/libros` sin filtros | Todos los libros |
+| Filtrar por autor | Solo los libros de ese autor |
+| `/libros?anioDesde=1960&anioHasta=1970` | Incluye los libros de 1960 y de 1970 |
+| `/libros?anioHasta=1965` | Funciona con un solo extremo |
+| Autor + rango sin coincidencias | Mensaje "No hay libros con esos filtros" |
+| `/libros?anioDesde=1970&anioHasta=1960` | Error de rango, sin tabla |
+| Escribir `abc` en Desde o en Hasta | "Debe ser un número", sin tabla |
+| **Limpiar** | Vuelve a `/libros` sin filtros |
 
 
 ---
