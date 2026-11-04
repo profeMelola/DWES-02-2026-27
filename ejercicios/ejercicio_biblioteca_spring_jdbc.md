@@ -207,8 +207,7 @@ Requisitos de las vistas:
 
 - `th:object`, `th:field`, `th:errors` y errores con Bootstrap, como en LogísticaApp.
 - La tabla no muestra el `id`.
-- El borrado es un `<form method="post">` con `confirm()` que avisa de que también se borrarán los libros del autor.
-
+- El borrado es un `<form method="post">` con `confirm()` que avisa de que también se borrarán los libros del autor. Comprobad en /h2-console que no quedan libros de ese autor.
 
 ---
 
