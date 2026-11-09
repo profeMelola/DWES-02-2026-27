@@ -1607,7 +1607,57 @@ GET /fabricantes/1/productos
         → ProductoService.listarPorFabricante        (regla de negocio)                                                                                                                                                             
             → ProductoRepositoryJdbc.findByFabricanteCodigo   (SQL)                                                                                                                                                                 
     → fabricantes/productos.html  
-    
+
+
+```html
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Productos del fabricante')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<!-- RETO 2: productos de un fabricante -->
+<div class="container" style="max-width: 800px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-success">
+            <!-- El fabricante llega aparte en el modelo: si no tiene productos, también hay título -->
+            🏭 <span th:text="${fabricante.nombre}">Fabricante</span>
+            <!-- |...| es sustitución literal: mezcla texto y expresiones sin concatenar con + -->
+            <small class="text-muted fs-5" th:text="?????????????????????????????">(0 productos)</small>
+        </h2>
+        <a th:href="@{/fabricantes}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a fabricantes
+        </a>
+    </div>
+
+    <!-- Sin columna Fabricante (ya sale en el título) ni botones: es una página de consulta -->
+    <table class="table table-bordered table-hover bg-white align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- colspan="3": la fila ocupa las tres columnas de la tabla -->
+        <tr th:if="${#lists.isEmpty(productos)}">
+            <td colspan="3" class="text-center text-muted">Este fabricante no tiene productos</td>
+        </tr>
+        <tr ?????????>
+            <td ?????????????>1</td>
+            <td ???????????>Nombre</td>
+            <td th:text="${#numbers.formatDecimal(p.precio, 1, 2, 'POINT')}">0.00</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+```
 --- 
 
 ### 3. **RETO 3: Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
