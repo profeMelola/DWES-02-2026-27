@@ -1601,6 +1601,13 @@ Listado de productos es parecida a `productos/lista.html`, con dos diferencias:
 - **Sin botones de editar ni borrar**: es una página de consulta.
 
 
+GET /fabricantes/1/productos                                                                                                                                                                                                      
+    → FabricanteController.productosDelFabricante                                                                                                                                                                                   
+        → FabricanteService.buscarPorCodigo          (título, o 404)                                                                                                                                                                
+        → ProductoService.listarPorFabricante        (regla de negocio)                                                                                                                                                             
+            → ProductoRepositoryJdbc.findByFabricanteCodigo   (SQL)                                                                                                                                                                 
+    → fabricantes/productos.html  
+    
 --- 
 
 ### 3. **RETO 3: Regla de negocio nueva en el servicio:** no permitir dos fabricantes con el mismo nombre (sin distinguir mayúsculas).
