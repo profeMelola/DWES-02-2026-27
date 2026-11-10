@@ -320,6 +320,7 @@ Lo que no aparece en LogísticaApp, por orden de prioridad.
 
 ## Reto: Año de nacimiento del autor
 
+**Un dato nuevo obliga a recorrer todas las capas.**
 
 Cada autor guarda su **año de nacimiento**: un número entero obligatorio, en la columna `anio_nacimiento`.
 
