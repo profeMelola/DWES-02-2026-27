@@ -318,5 +318,27 @@ Lo que no aparece en LogísticaApp, por orden de prioridad.
 
 ---
 
+## Reto: Año de nacimiento del autor
+
+
+Cada autor guarda su **año de nacimiento**: un número entero obligatorio, en la columna `anio_nacimiento`.
+
+Datos de los autores actuales:
+
+| Autor | Año | Autor | Año |
+|---|---|---|---|
+| Gabriel García Márquez | 1927 | Ana María Matute | 1925 |
+| Julio Cortázar | 1914 | Miguel Delibes | 1920 |
+| Mario Vargas Llosa | 1936 | Almudena Grandes | 1960 |
+| Isabel Allende | 1942 | Elena Poniatowska | 1932 |
+| Carmen Laforet | 1921 | | |
+
+Requisitos:
+
+- El año se puede indicar en el alta y en la edición de autores.
+- Es obligatorio y debe estar entre 1000 y 2026. Si no es válido, el error aparece junto al campo y no se pierden los datos.
+- El listado de autores muestra una columna **Nacimiento**.
+
+---
 
 [← Volver a ejercicios](./readme.md)
