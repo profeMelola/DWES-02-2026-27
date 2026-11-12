@@ -232,17 +232,6 @@ public Optional<Producto> findById(Integer id) {
 }
 ```
 
-#### Tres formas típicas de romper Liskov
-
-| ❌ La implementación... | Por qué rompe | ✅ Lo correcto |
-|---|---|---|
-| Devuelve `null` donde promete `Optional` o `List` | Quien llama hace `.orElseThrow()` o `.stream()` y explota | `Optional.empty()` / `List.of()` |
-| Lanza `UnsupportedOperationException` | Funciona con una implementación y falla con otra | Implementar el método o dividir la interfaz (→ principio **I**) |
-| Hace algo distinto a lo que dice su nombre (`save` que no guarda, `findAll` que solo trae los activos) | Resultados incorrectos **sin ningún error visible** | Mismo comportamiento en todas |
-
-> Mientras desarrollas es normal dejar `throw new UnsupportedOperationException("Pendiente")` en un método. Lo que no puede pasar es que **la entrega final** lo conserve.
-
-**Prueba rápida:** ejecuta lo mismo con cada implementación (por ejemplo, buscar un id que no existe y listar con la tabla vacía). Si el resultado cambia, alguna incumple el contrato.
 ---
 
 ### I · Interface Segregation (interfaces pequeñas)
