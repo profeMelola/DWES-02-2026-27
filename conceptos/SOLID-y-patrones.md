@@ -379,7 +379,6 @@ spring.profiles.active=memoria
 | **Service** | Reglas de negocio en un solo sitio | `ProductoService` |
 | **DTO / Form** | Mover datos a la vista sin exponer el modelo | `ProductoForm` |
 | **Singleton** | Una sola instancia | Los beans de Spring lo son por defecto |
-| **Strategy** | Cambiar un algoritmo sin `if / else` | `Descuento` + sus implementaciones |
 
 ### DTO / Form: datos del formulario
 
