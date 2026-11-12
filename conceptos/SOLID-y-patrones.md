@@ -20,6 +20,7 @@ es.daw.productos
 ├── service      → ProductoService            (reglas de negocio)
 ├── repository   → ProductoRepository         (interfaz)
 │                  ProductoRepositoryJdbc     (implementación)
+│                  ProductoRepositoryListaMemoria (implementación)
 ├── model        → Producto
 └── form         → ProductoForm               (datos del formulario)
 ```
@@ -31,7 +32,6 @@ flowchart LR
     C --> S[Service]
     S --> R["«interface»<br/>ProductoRepository"]
     J[ProductoRepositoryJdbc] -.->|implementa| R
-    A[ProductoRepositoryJPA] -.->|implementa| R
     M[ProductoRepositoryListaMemoria] -.->|implementa| R
 ```
 
@@ -156,13 +156,13 @@ public class PrecioService {
 
 Para añadir `BLACKFRIDAY` creas `DescuentoBlackFriday` con `@Component` y **no tocas `PrecioService`**: Spring lo mete en la lista solo.
 
-> **"¡Pero sigue habiendo un `if`!"** Sí, pero **nunca crece**. El `if / else if` del ejemplo malo tenía una rama por cada descuento; este es siempre el mismo, haya 2 descuentos o 20.---
+> **"¡Pero sigue habiendo un `if`!"** Sí, pero **nunca crece**. El `if / else if` del ejemplo malo tenía una rama por cada descuento; este es siempre el mismo, haya 2 descuentos o 20.
 
 ---
 
 ### L · Liskov Substitution (sustitución)
 
-**Regla:** si el servicio funciona con una implementación de la interfaz, **tiene que funcionar igual con cualquier otra**. Cambiar `ProductoRepositoryJdbc` por `ProductoRepositoryMemoria` no puede romper nada.
+**Regla:** si el servicio funciona con una implementación de la interfaz, **tiene que funcionar igual con cualquier otra**. Cambiar `ProductoRepositoryJdbc` por `ProductoRepositoryListaMemoria` no puede romper nada.
 
 **Idea clave:** una interfaz no es solo una lista de métodos, es una **promesa**. Implementarla significa cumplir la promesa, no solo conseguir que compile.
 
@@ -200,16 +200,18 @@ El servicio no sabe qué implementación tiene debajo, y no debe saberlo.
 
 ```java
 @Repository
-public class ProductoRepositoryMemoria implements ProductoRepository {
+public class ProductoRepositoryListaMemoria implements ProductoRepository {
 
-    private final Map<Integer, Producto> datos = new HashMap<>();
+    private final List<Producto> productos = new ArrayList<>();
 
     @Override
     public Optional<Producto> findById(Integer id) {
-        if (!datos.containsKey(id)) {
-            return null;                          // promete Optional y devuelve null
+        for (Producto p : productos) {
+            if (p.getId().equals(id)) {
+                return Optional.of(p);
+            }
         }
-        return Optional.of(datos.get(id));
+        return null;                              // promete Optional y devuelve null
     }
 }
 ```
@@ -219,18 +221,25 @@ Mismo servicio, misma llamada `buscar(99)` con un id que no existe:
 | Implementación | Resultado |
 |---|---|
 | `ProductoRepositoryJdbc` | `ProductoNoEncontradoException` → error controlado ✅ |
-| `ProductoRepositoryMemoria` | `NullPointerException` en el **servicio** 💥 |
+| `ProductoRepositoryListaMemoria` | `NullPointerException` en el **servicio** 💥 |
 
 **El error salta en el servicio, pero el culpable es el repositorio.** Por eso estos fallos cuestan tanto de encontrar.
 
-✅ **Bien:**
+✅ **Bien:** la única diferencia está en la última línea.
 
 ```java
 @Override
 public Optional<Producto> findById(Integer id) {
-    return Optional.ofNullable(datos.get(id));    // si no existe: Optional.empty()
+    for (Producto p : productos) {
+        if (p.getId().equals(id)) {
+            return Optional.of(p);
+        }
+    }
+    return Optional.empty();                      // si no existe: Optional vacío
 }
 ```
+
+**Prueba rápida:** pon `@Primary` en cada implementación (lo verás en la D) y busca un id que no existe. Si el resultado cambia, alguna incumple el contrato.
 
 ---
 
@@ -273,7 +282,7 @@ public class Ebook implements Articulo {
 }
 ```
 
-Las dos clases están **obligadas a mentir** para que el código compile. Y son justo las dos primeras formas de romper Liskov.
+Las dos clases están **obligadas a mentir** para que el código compile. Y son justo las señales de alarma de Liskov.
 
 ✅ **Bien:** una interfaz por capacidad.
 
@@ -344,15 +353,18 @@ public class ProductoService {
 }
 ```
 
-**Lo que ganas:** en la UT04 pasarás de JDBC a JPA **sin tocar el servicio**. Solo escribes la nueva implementación:
+**Lo que ganas:** cambiar de JDBC a una lista en memoria (por ejemplo, para probar sin base de datos) **sin tocar el servicio**:
 
 ```java
 @Repository
-public class ProductoRepositoryJdbc implements ProductoRepository { /* SQL con JDBC (UT02) */ }
+public class ProductoRepositoryJdbc implements ProductoRepository { /* SQL con JDBC */ }
 
 @Repository
 @Primary                                              // ← Spring inyecta esta
-public class ProductoRepositoryJPA implements ProductoRepository { /* EntityManager (UT04) */ }
+public class ProductoRepositoryListaMemoria implements ProductoRepository {
+    private final List<Producto> productos = new ArrayList<>();
+    /* ... */
+}
 ```
 
 > **Dos componentes que implementan la misma interfaz:** Spring no sabe cuál inyectar y la aplicación no arranca (*"required a single bean, but 2 were found"*). Con `@Primary` le indicas cuál usar. Para volver a JDBC, mueves `@Primary` a la otra clase. **El servicio no se entera.**
@@ -366,7 +378,7 @@ public class ProductoRepositoryJPA implements ProductoRepository { /* EntityMana
 | Patrón | Problema que resuelve | En tu proyecto |
 |---|---|---|
 | **MVC** | Separar vista, lógica y datos | `@Controller` + Thymeleaf + `Model` |
-| **Inyección de dependencias (IoC)** | No hacer `new` de colaboradores | Constructor + `@Service` / `@Repository` / `@Component` |
+| **Inyección de dependencias (IoC)** | No hacer `new` de otros componentes | Constructor + `@Service` / `@Repository` / `@Component` |
 | **Repository** | Acceso a datos detrás de una interfaz | `ProductoRepository` |
 | **Service** | Reglas de negocio en un solo sitio | `ProductoService` |
 | **DTO / Form** | Mover datos a la vista sin exponer el modelo | `ProductoForm` |
@@ -430,9 +442,7 @@ public class ProductoService {
 | Ir a las implementaciones de una interfaz | `Ctrl + Alt + B` |
 | Ver quién usa esta clase | `Alt + F7` |
 | Diagrama de clases (Ultimate) | `Ctrl + Alt + Shift + U` |
-| Cambiar de perfil | *Run → Edit Configurations → Active profiles* |
 
 **Flujo típico para separar capas:** sobre una clase `ProductoRepositoryJdbc`, `Ctrl + Alt + Shift + T` → *Extract Interface* → marcas los métodos y obtienes `ProductoRepository`.
-
 
 
