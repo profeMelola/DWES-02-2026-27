@@ -236,40 +236,93 @@ public Optional<Producto> findById(Integer id) {
 
 ### I · Interface Segregation (interfaces pequeñas)
 
-**Regla:** nadie debe depender de métodos que **no usa**.
+**Regla:** ninguna clase debe estar obligada a implementar métodos que **no usa**, ni a depender de ellos.
 
-**Señal de alarma:** una clase que implementa una interfaz de siete métodos y deja cuatro vacíos.
+**Idea clave:** mejor varias interfaces pequeñas que una grande "para todo".
 
-❌ **Mal:** un servicio de consulta que depende de una interfaz que también borra y modifica.
+**Señal de alarma:** métodos que devuelven `0` o `null`, o lanzan `UnsupportedOperationException`, *"porque en esta clase no tiene sentido"*.
 
-✅ **Bien:** separar lectura y escritura.
+**Escenario:** la tienda vende libros en papel (se envían) y ebooks (se descargan).
+
+❌ **Mal:** una interfaz que sirve para todo.
 
 ```java
-public interface ProductoLectura {
-    Optional<Producto> findById(Integer id);
-    List<Producto> findAll();
+public interface Articulo {
+    String getNombre();
+    double getPrecio();
+    double getPesoKg();        // para calcular el envío
+    String getUrlDescarga();   // para productos digitales
 }
 
-public interface ProductoEscritura {
-    void save(Producto producto);
-    void update(Producto producto);
-    void delete(Integer id);
+public class LibroPapel implements Articulo {
+    /* nombre, precio, peso... */
+
+    @Override
+    public String getUrlDescarga() {
+        throw new UnsupportedOperationException();   // un libro de papel no se descarga
+    }
 }
 
-// Quien lo necesita todo, usa esta
-public interface ProductoRepository extends ProductoLectura, ProductoEscritura { }
+public class Ebook implements Articulo {
+    /* nombre, precio, url... */
 
-@Service
-public class CatalogoService {
-
-    private final ProductoLectura productos;   // solo puede leer
-
-    public CatalogoService(ProductoLectura productos) {
-        this.productos = productos;
+    @Override
+    public double getPesoKg() {
+        return 0;                                     // ¿pesa 0 kg? ¿y si alguien calcula su envío?
     }
 }
 ```
 
+Las dos clases están **obligadas a mentir** para que el código compile. Y son justo las dos primeras formas de romper Liskov.
+
+✅ **Bien:** una interfaz por capacidad.
+
+```java
+public interface Articulo {
+    String getNombre();
+    double getPrecio();
+}
+
+public interface Enviable {
+    double getPesoKg();
+}
+
+public interface Descargable {
+    String getUrlDescarga();
+}
+
+public class LibroPapel     implements Articulo, Enviable              { /* ... */ }
+public class Ebook          implements Articulo, Descargable           { /* ... */ }
+public class PackLibroEbook implements Articulo, Enviable, Descargable { /* ... */ }
+```
+
+Cada servicio pide **solo lo que necesita**:
+
+```java
+@Service
+public class EnvioService {
+    public double calcularCoste(Enviable articulo) {
+        return 3.0 + articulo.getPesoKg() * 1.5;
+    }
+}
+
+@Service
+public class DescargaService {
+    public String generarEnlace(Descargable articulo) {
+        return articulo.getUrlDescarga() + "?token=" + UUID.randomUUID();
+    }
+}
+```
+
+**Lo que ganas:** `envioService.calcularCoste(ebook)` **ya no compila**. El error lo detecta el compilador, no un cliente al que le cobran el envío de un PDF.
+
+| | Interfaz grande | Interfaces pequeñas |
+|---|---|---|
+| Métodos "de relleno" | Sí (`throw`, `return 0`) | No |
+| Calcular el envío de un ebook | Compila y da un resultado absurdo | No compila |
+| Añadir un producto que es las dos cosas | Igual que los demás | `implements Enviable, Descargable` |
+
+**Prueba rápida:** ¿hay algún método implementado con `return 0`, `return null` o `throw new UnsupportedOperationException()` solo para cumplir la interfaz? Entonces la interfaz es demasiado grande: divídela.
 ---
 
 ### D · Dependency Inversion (inversión de dependencias)
