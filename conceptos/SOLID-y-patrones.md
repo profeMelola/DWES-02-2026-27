@@ -314,15 +314,6 @@ public class DescargaService {
 }
 ```
 
-**Lo que ganas:** `envioService.calcularCoste(ebook)` **ya no compila**. El error lo detecta el compilador, no un cliente al que le cobran el envío de un PDF.
-
-| | Interfaz grande | Interfaces pequeñas |
-|---|---|---|
-| Métodos "de relleno" | Sí (`throw`, `return 0`) | No |
-| Calcular el envío de un ebook | Compila y da un resultado absurdo | No compila |
-| Añadir un producto que es las dos cosas | Igual que los demás | `implements Enviable, Descargable` |
-
-**Prueba rápida:** ¿hay algún método implementado con `return 0`, `return null` o `throw new UnsupportedOperationException()` solo para cumplir la interfaz? Entonces la interfaz es demasiado grande: divídela.
 ---
 
 ### D · Dependency Inversion (inversión de dependencias)
