@@ -359,8 +359,6 @@ public class ProductoRepositoryJPA implements ProductoRepository { /* EntityMana
 
 > **Inyección por constructor, siempre.** Nada de `@Autowired` sobre atributos: IntelliJ te avisa con *Field injection is not recommended*. Cuando domines el constructor explícito puedes sustituirlo por `@RequiredArgsConstructor` de Lombok con atributos `final`.
 
-> **¿Interfaz también para el servicio?** No por costumbre. Ponla cuando haya (o vaya a haber) varias implementaciones. En el repositorio sí, porque ahí cambiarás JDBC por JPA.
-
 ---
 
 ## 4. Patrones que usarás en la UT02
