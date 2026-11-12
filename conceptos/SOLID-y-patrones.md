@@ -315,14 +315,13 @@ public class DescargaService {
 ```
 
 ---
-
 ### D · Dependency Inversion (inversión de dependencias)
 
-**Regla:** las clases de alto nivel (el servicio) dependen de **interfaces**, no de implementaciones concretas. Y no crean sus colaboradores con `new`: **se los dan**.
+**Regla:** los componentes de alto nivel (el servicio) dependen de **interfaces**, no de implementaciones concretas. Y nunca hacen `new` de otro componente: **Spring lo crea y se lo inyecta**.
 
-**Señal de alarma:** un `new` de un repositorio o un servicio dentro de otra clase.
+**Señal de alarma:** un `new` de un repositorio o de un servicio dentro de otro componente.
 
-❌ **Mal:** el servicio crea y conoce la implementación.
+❌ **Mal:** el servicio crea el repositorio y conoce la implementación.
 
 ```java
 @Service
@@ -345,29 +344,24 @@ public class ProductoService {
 }
 ```
 
-**Lo que ganas:** cambiar de JDBC a memoria (o a JPA en la UT04) **sin tocar el servicio**.
+**Lo que ganas:** en la UT04 pasarás de JDBC a JPA **sin tocar el servicio**. Solo escribes la nueva implementación:
 
 ```java
 @Repository
-@Profile("jdbc")
-public class ProductoRepositoryJdbc implements ProductoRepository { /* ... */ }
+public class ProductoRepositoryJdbc implements ProductoRepository { /* SQL con JDBC (UT02) */ }
 
 @Repository
-@Profile("memoria")
-public class ProductoRepositoryMemoria implements ProductoRepository {
-    private final Map<Integer, Producto> datos = new ConcurrentHashMap<>();
-    /* ... */
-}
+@Primary                                              // ← Spring inyecta esta
+public class ProductoRepositoryJPA implements ProductoRepository { /* EntityManager (UT04) */ }
 ```
 
-```properties
-# application.properties: cambias una línea y arranca con otra implementación
-spring.profiles.active=memoria
-```
+> **Dos componentes que implementan la misma interfaz:** Spring no sabe cuál inyectar y la aplicación no arranca (*"required a single bean, but 2 were found"*). Con `@Primary` le indicas cuál usar. Para volver a JDBC, mueves `@Primary` a la otra clase. **El servicio no se entera.**
 
 > **Inyección por constructor, siempre.** Nada de `@Autowired` sobre atributos: IntelliJ te avisa con *Field injection is not recommended*. Cuando domines el constructor explícito puedes sustituirlo por `@RequiredArgsConstructor` de Lombok con atributos `final`.
 
 > **¿Interfaz también para el servicio?** No por costumbre. Ponla cuando haya (o vaya a haber) varias implementaciones. En el repositorio sí, porque ahí cambiarás JDBC por JPA.
+
+---
 
 ## 4. Patrones que usarás en la UT02
 
