@@ -202,7 +202,7 @@ El servicio no sabe qué implementación tiene debajo, y no debe saberlo.
 @Repository
 public class ProductoRepositoryMemoria implements ProductoRepository {
 
-    private final Map<Integer, Producto> datos = new ConcurrentHashMap<>();
+    private final Map<Integer, Producto> datos = new HashMap<>();
 
     @Override
     public Optional<Producto> findById(Integer id) {
