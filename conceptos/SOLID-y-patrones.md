@@ -119,41 +119,44 @@ public double precioFinal(double precio, String tipo) {
 }
 ```
 
-✅ **Bien:** patrón **Strategy** con beans de Spring.
+✅ **Bien:** patrón **Strategy** con beans de Spring. Cada descuento es una clase y **sabe a qué tipo se aplica**.
 
 ```java
 public interface Descuento {
+    boolean soporta(String tipo);
     double aplicar(double precio);
 }
 
-@Component("NAVIDAD")
+@Component
 public class DescuentoNavidad implements Descuento {
+    public boolean soporta(String tipo) { return "NAVIDAD".equals(tipo); }
     public double aplicar(double precio) { return precio * 0.90; }
-}
-
-@Component("SIN_DESCUENTO")
-public class SinDescuento implements Descuento {
-    public double aplicar(double precio) { return precio; }
 }
 
 @Service
 public class PrecioService {
 
-    // Spring inyecta TODOS los beans de tipo Descuento; la clave es el nombre del bean
-    private final Map<String, Descuento> descuentos;
+    // Spring inyecta en la lista TODOS los beans que implementan Descuento
+    private final List<Descuento> descuentos;
 
-    public PrecioService(Map<String, Descuento> descuentos) {
+    public PrecioService(List<Descuento> descuentos) {
         this.descuentos = descuentos;
     }
 
     public double precioFinal(double precio, String tipo) {
-        return descuentos.getOrDefault(tipo, descuentos.get("SIN_DESCUENTO"))
-                         .aplicar(precio);
+        for (Descuento d : descuentos) {
+            if (d.soporta(tipo)) {
+                return d.aplicar(precio);
+            }
+        }
+        return precio;   // ningún descuento aplica
     }
 }
 ```
 
-Para añadir `BLACKFRIDAY` creas `@Component("BLACKFRIDAY") class DescuentoBlackFriday ...` y **no tocas `PrecioService`**.
+Para añadir `BLACKFRIDAY` creas `DescuentoBlackFriday` con `@Component` y **no tocas `PrecioService`**: Spring lo mete en la lista solo.
+
+> **"¡Pero sigue habiendo un `if`!"** Sí, pero **nunca crece**. El `if / else if` del ejemplo malo tenía una rama por cada descuento; este es siempre el mismo, haya 2 descuentos o 20.---
 
 ---
 
