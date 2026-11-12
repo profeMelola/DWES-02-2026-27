@@ -31,6 +31,8 @@ flowchart LR
     C --> S[Service]
     S --> R["«interface»<br/>ProductoRepository"]
     J[ProductoRepositoryJdbc] -.->|implementa| R
+    A[ProductoRepositoryJPA] -.->|implementa| R
+    M[ProductoRepositoryListaMemoria] -.->|implementa| R
 ```
 
 Regla de oro: **las flechas van siempre hacia la derecha**. El controlador conoce al servicio, el servicio conoce a la interfaz del repositorio, y nadie conoce a la implementación.
