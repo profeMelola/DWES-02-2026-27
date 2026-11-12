@@ -162,32 +162,87 @@ Para añadir `BLACKFRIDAY` creas `DescuentoBlackFriday` con `@Component` y **no 
 
 ### L · Liskov Substitution (sustitución)
 
-**Regla:** cualquier implementación de una interfaz debe poder **sustituir a otra sin que el código que la usa se entere**. Todas cumplen el mismo contrato.
+**Regla:** si el servicio funciona con una implementación de la interfaz, **tiene que funcionar igual con cualquier otra**. Cambiar `ProductoRepositoryJdbc` por `ProductoRepositoryMemoria` no puede romper nada.
+
+**Idea clave:** una interfaz no es solo una lista de métodos, es una **promesa**. Implementarla significa cumplir la promesa, no solo conseguir que compile.
+
+> **Analogía:** cualquier cargador USB-C vale para tu móvil. Uno que encaja en el puerto pero no carga "implementa" USB-C... y rompe el contrato.
 
 **Señal de alarma:** una implementación que devuelve `null`, lanza `UnsupportedOperationException` o se comporta distinto a las demás.
 
-❌ **Mal:** rompe el contrato de la interfaz.
+#### 1. La promesa (el contrato)
+
+```java
+public interface ProductoRepository {
+
+    /** Devuelve el producto, o Optional.empty() si no existe. Nunca null. */
+    Optional<Producto> findById(Integer id);
+
+    /** Devuelve todos los productos, o una lista vacía si no hay. Nunca null. */
+    List<Producto> findAll();
+}
+```
+
+#### 2. El servicio confía en la promesa
+
+```java
+public Producto buscar(int id) {
+    return repository.findById(id)
+            .orElseThrow(() -> new ProductoNoEncontradoException(id));
+}
+```
+
+El servicio no sabe qué implementación tiene debajo, y no debe saberlo.
+
+#### 3. Una implementación que no la cumple
+
+❌ **Mal:** compila, pero rompe la promesa.
+
+```java
+@Repository
+public class ProductoRepositoryMemoria implements ProductoRepository {
+
+    private final Map<Integer, Producto> datos = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<Producto> findById(Integer id) {
+        if (!datos.containsKey(id)) {
+            return null;                          // promete Optional y devuelve null
+        }
+        return Optional.of(datos.get(id));
+    }
+}
+```
+
+Mismo servicio, misma llamada `buscar(99)` con un id que no existe:
+
+| Implementación | Resultado |
+|---|---|
+| `ProductoRepositoryJdbc` | `ProductoNoEncontradoException` → error controlado ✅ |
+| `ProductoRepositoryMemoria` | `NullPointerException` en el **servicio** 💥 |
+
+**El error salta en el servicio, pero el culpable es el repositorio.** Por eso estos fallos cuestan tanto de encontrar.
+
+✅ **Bien:**
 
 ```java
 @Override
 public Optional<Producto> findById(Integer id) {
-    return null;   // la interfaz promete un Optional, y el servicio hace .orElseThrow()
+    return Optional.ofNullable(datos.get(id));    // si no existe: Optional.empty()
 }
 ```
 
-✅ **Bien:** todas las implementaciones se comportan igual.
+#### Tres formas típicas de romper Liskov
 
-```java
-@Override
-public Optional<Producto> findById(Integer id) {
-    return Optional.ofNullable(datos.get(id));   // si no existe: Optional.empty()
-}
-```
+| ❌ La implementación... | Por qué rompe | ✅ Lo correcto |
+|---|---|---|
+| Devuelve `null` donde promete `Optional` o `List` | Quien llama hace `.orElseThrow()` o `.stream()` y explota | `Optional.empty()` / `List.of()` |
+| Lanza `UnsupportedOperationException` | Funciona con una implementación y falla con otra | Implementar el método o dividir la interfaz (→ principio **I**) |
+| Hace algo distinto a lo que dice su nombre (`save` que no guarda, `findAll` que solo trae los activos) | Resultados incorrectos **sin ningún error visible** | Mismo comportamiento en todas |
 
 > Mientras desarrollas es normal dejar `throw new UnsupportedOperationException("Pendiente")` en un método. Lo que no puede pasar es que **la entrega final** lo conserve.
 
-**Prueba rápida:** ¿puedo cambiar `ProductoRepositoryJdbc` por `ProductoRepositoryMemoria` y el servicio sigue funcionando igual?
-
+**Prueba rápida:** ejecuta lo mismo con cada implementación (por ejemplo, buscar un id que no existe y listar con la tabla vacía). Si el resultado cambia, alguna incumple el contrato.
 ---
 
 ### I · Interface Segregation (interfaces pequeñas)
