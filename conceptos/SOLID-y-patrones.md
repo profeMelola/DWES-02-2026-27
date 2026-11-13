@@ -428,6 +428,43 @@ public class ProductoService {
 
 ✅ **Bien:** un servicio **no guarda datos de un usuario**. Si hay que recordar algo de cada usuario, va en la sesión (se verá con RA4) o se pasa como parámetro.
 
+
+### Singleton a mano
+
+```java
+public class ContadorVisitas {
+
+    private static final ContadorVisitas INSTANCIA = new ContadorVisitas();   // 1) la única instancia
+
+    private int visitas = 0;
+
+    private ContadorVisitas() { }                    // 2) constructor privado: nadie puede hacer new
+
+    public static ContadorVisitas getInstance() {    // 3) único punto de acceso
+        return INSTANCIA;
+    }
+
+    public void registrar() { visitas++; }
+    public int getVisitas() { return visitas; }
+}
+```
+
+```java
+ContadorVisitas a = ContadorVisitas.getInstance();
+ContadorVisitas b = ContadorVisitas.getInstance();
+
+a.registrar();
+b.registrar();
+
+System.out.println(a.getVisitas());   // 2  → a y b son el mismo objeto
+System.out.println(a == b);           // true
+
+new ContadorVisitas();                // ❌ no compila: el constructor es privado
+```
+
+Las tres piezas: **atributo `static`**, **constructor `private`** y **método `static` `getInstance()`**.
+
+> **En Spring no lo escribes tú:** cada `@Service`, `@Repository` o `@Component` ya es un singleton. Spring crea la única instancia y te la inyecta.
 ---
 
 ## 5. Chuleta de IntelliJ (Windows y Linux)
