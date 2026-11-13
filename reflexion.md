@@ -2,7 +2,7 @@
 
 <img width="396" height="461" alt="image" src="https://github.com/user-attachments/assets/ac9636ab-4503-4640-9486-ab5c75d44b1c" />
 
-- **a función de la programación ha cambiado:** ya no se trata solo de escribir sintaxis o teclear código, sino de saber pensar, estructurar problemas y validar soluciones.
+- **La función de la programación ha cambiado:** ya no se trata solo de escribir sintaxis o teclear código, sino de saber pensar, estructurar problemas y validar soluciones.
 - **La IA genera código, no criterio:** Las herramientas de inteligencia artificial copian y ensamblan patrones conocidos, pero no entienden la lógica del negocio, la arquitectura general ni las consecuencias reales de un fallo en producción.
 - **El riesgo de "vibe coding" o copiar sin entender:** Si no sabes programar, no podrás verificar si el código que te da la IA es seguro, eficiente o correcto. Cuando el código falle (y lo hará), no sabrás cómo depurarlo ni cómo arreglar los errores ocultos.
 - **Las bases no han muerto, han evolucionado:** Hoy en día, escribir código a mano representa solo una parte del trabajo, mientras que el diseño, la depuración compleja y la integración de sistemas siguen requiriendo pensamiento humano.
