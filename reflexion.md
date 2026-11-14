@@ -23,3 +23,10 @@
 
 - **No se trata de IA sí o IA no.** Se trata de que la nota diga la verdad sobre lo que sabéis hacer.
 - **Se evalúa el recorrido, no solo el resultado:** los prompts, las decisiones que tomáis y si sabéis explicar y modificar lo que entregáis.
+
+## Conclusión
+
+- El criterio para usar la IA de forma eficiente solo se adquiere programando sin ella. Por eso las empresas que se toman en serio la selección evalúan primero sin IA y después con IA.
+- Ocurre lo mismo que con la calculadora. Su llegada no hizo que dejáramos de aprender a sumar...
+- Con la IA la diferencia es todavía mayor. La calculadora no se equivoca si se usa bien; la IA sí, y además sus errores parecen correctos: código que compila y funciona en el caso fácil, pero que es inseguro, ineficiente o rompe la arquitectura. 
+- Para detectarlos hay que saber programar. Dejar de aprender a programar porque existe la IA nos dejaría sin la capacidad de decidir qué le pedimos y de comprobar si lo que nos devuelve está bien.
