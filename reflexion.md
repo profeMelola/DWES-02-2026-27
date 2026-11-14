@@ -34,3 +34,5 @@
   - En estos entornos, la IA pierde gran parte de su eficacia: mezcla sintaxis de distintas versiones, inventa funciones que no existían en esa época o rompe dependencias delicadas sin darse cuenta.
   - Cuando te toque entrar en una empresa a mantener una aplicación crítica en producción que lleva diez años funcionando, la IA no te va a sacar las castañas del fuego.
   - Ahí solo sobrevive quien sabe leer código ajeno, entender cómo funciona la tecnología por debajo y depurar paso a paso.
+
+> **Cuidado con el "síndrome del impostor".** Estudiantes brillantes pueden sentir que usar IA es "hacer trampas" incluso cuando ya tienen base. Una vez superada la fase sin IA, no usarla en el día a día te hace menos competitivo. Úsala!!!!
