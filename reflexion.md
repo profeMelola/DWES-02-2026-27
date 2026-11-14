@@ -33,6 +33,7 @@ En clase trabajamos con las últimas versiones, pero en el mundo real gran parte
 ## ¿Por qué habrá un examen con IA en la 2ª evaluación?
 
 - **Adaptarse sin ir más rápido que las empresas.** A día de hoy, y podría cambiar en el futuro, las empresas que se toman en serio la selección evalúan primero sin IA y después con IA.
+- **FFE:**porque en las FFFE y en vuestro primer empleo la vais a usar a diario, y queremos que lleguéis sabiendo dirigirla con rigor, no improvisando
 
 ## ¿Cómo será el examen con IA?
 
