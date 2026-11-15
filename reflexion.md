@@ -41,11 +41,11 @@ En clase trabajamos con las últimas versiones, pero en el mundo real gran parte
 - **Que funcione no es suficiente.** Una solución que funciona no garantiza el aprobado.
 - **Tendréis que defender lo que entregáis.** Explicar cómo funciona y modificarlo en directo, sin IA. Si no sabes explicar tu código, ese código no cuenta como tuyo.
 
-## Conclusión: la calculadora
+## Conclusión
 
 El criterio para usar la IA de forma eficiente solo se adquiere programando sin ella.
 
-Ocurre lo mismo que con la calculadora. Su llegada no hizo que dejáramos de aprender a sumar, porque para usarla bien hay que saber qué operación plantear, estimar si el resultado es razonable y darse cuenta de que sobra un cero. Quien no sabe sumar acepta cualquier número que aparezca en la pantalla.
+Ocurre lo mismo que con la calculadora. Su llegada no hizo que dejáramos de aprender a sumar. Quien no sabe sumar acepta cualquier número que aparezca en la pantalla.
 
 Con la IA la diferencia es todavía mayor. La calculadora no se equivoca si se usa bien; la IA sí, y además sus errores parecen correctos: código que compila y funciona en el caso fácil, pero que es inseguro, ineficiente o rompe la arquitectura. Para detectarlos hay que saber programar. Dejar de aprender a programar porque existe la IA nos dejaría sin la capacidad de decidir qué le pedimos y de comprobar si lo que nos devuelve está bien.
 
