@@ -7,3 +7,4 @@
 | 2 | [Personajes de Springfield en Spring MVC (autónomo)](./simpsons-spring.md) | Migración completa: capas, DTO + `@Valid` con formulario GET, streams en el servicio |
 | 3 | [Productos JDBC](./ejercicio_productos_spring_jdbc.md) | LogísticaApp: Spring CRUD JDBC [Descarga el proyecto y trabaja offline](./producto-jdbc-ALUMNO.zip) |
 | 4 | [Biblioteca JDBC](./ejercicio_biblioteca_spring_jdbc.md) | BibliotecaApp: Spring CRUD JDBC [Descarga el proyecto y trabaja offline](./biblioteca-jdbc.zip) |
+| 5 | [Biblioteca JDBC securizada (práctica guiada)](./practica-guiada-spring-security.md) | Spring Security 7: `SecurityFilterChain`, login propio, BCrypt, `UserDetailsService` con JDBC, roles ADMIN/USER, CSRF, `sec:authorize`, página 403, tests con `@WithMockUser` [Descarga el proyecto de partida y trabaja offline](./refuerzo/EXAMEN-1ev-ALUMNO.zip) |
