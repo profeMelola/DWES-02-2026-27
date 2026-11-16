@@ -529,6 +529,7 @@ Spring Security 7 (incluido en Spring Boot 4) **eliminó** muchas formas antigua
 | Cadena de filtros | Spring Security actúa antes que los controladores, en filtros configurados con `SecurityFilterChain`. |
 | `UserDetailsService` | Nuestro adaptador: busca el usuario en la BD y lo entrega a Spring como `UserDetails`. |
 | `ROLE_` | `hasRole("ADMIN")` busca la authority `ROLE_ADMIN`. En BD guardamos `ADMIN` y usamos `roles(...)`. |
+| Permisos finos | `hasAuthority("LIBRO_BORRAR")`: la regla pregunta qué puedes hacer, no quién eres. Útil con muchos roles. |
 | Orden de reglas | Gana la primera que coincide: de lo concreto a lo general, `anyRequest()` al final. |
 | `sec:authorize` | Oculta en la vista; no protege. La protección está en el servidor. |
 | CSRF | Token oculto en los formularios que impide que otra web actúe con tu sesión. Activado; logout por POST; nada que modifique por GET. |
