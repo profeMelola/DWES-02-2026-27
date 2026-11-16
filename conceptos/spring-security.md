@@ -272,24 +272,39 @@ flowchart TD
 
 ### Por qué nuestra clase `Usuario` no implementa `UserDetails`
 
-Sería posible (`public class Usuario implements UserDetails`), pero no lo hacemos:
+Hay dos formas de conectar nuestros usuarios con Spring Security:
 
-| Principio | Razón |
-|---|---|
-| **SRP** (responsabilidad única) | `Usuario` representa un usuario de la biblioteca. Adaptarlo a Spring Security es otra responsabilidad: la del `UserDetailsService`. |
-| **DIP** (inversión de dependencias) | El modelo no debe depender de un framework. Si mañana cambiamos la seguridad, `model` no se toca. |
-| Patrón **Adaptador** | El `UserDetailsService` traduce `Usuario` (nuestro) → `UserDetails` (de Spring). |
+**Opción A: la entidad implementa `UserDetails`**
 
-Esquema de capas:
-
-```
-UserDetailsService propio  ──usa──▶  UsuarioRepository (interfaz)
-         │                                   ▲
-         │ devuelve User (UserDetails)       │ implementa
-         ▼                                   │
-   Spring Security                  UsuarioRepositoryJdbc ──▶ H2
+```java
+public class Usuario implements UserDetails { ... }
 ```
 
+**Opción B: un `UserDetailsService` traduce `Usuario` → `User`**
+
+```java
+return User.builder()
+        .username(usuario.getUsername())
+        .password(usuario.getPassword())
+        .roles(usuario.getRol())
+        .build();
+```
+
+| | A: `implements UserDetails` | B: `UserDetailsService` traduce |
+|---|---|---|
+| ✅ Ventaja | Menos código: la entidad ya es lo que Spring necesita | `Usuario` solo representa un usuario de la biblioteca |
+| ✅ Ventaja | Es la forma más habitual en tutoriales y en el código que genera la IA | El modelo no depende de Spring Security |
+| ❌ Inconveniente | `Usuario` tiene dos responsabilidades: ser un usuario y ser un usuario de Spring Security | Unas líneas más de código |
+| ❌ Inconveniente | `model` se llena de métodos de Spring (`getAuthorities()`, `isEnabled()`…) | — |
+
+**Este curso usamos la opción B** porque aplica **SRP** (responsabilidad única): cada clase tiene un único motivo para cambiar.
+
+- Si cambian los datos del usuario → cambia `Usuario`.
+- Si cambia la forma de autenticar → cambia el `UserDetailsService`.
+
+El `UserDetailsService` actúa como **adaptador**: convierte nuestro objeto en el que espera Spring.
+
+> La opción A no está mal y funciona. Si la encuentras en internet, la reconocerás. Pero no separa responsabilidades, y este curso vamos en serio con los patrones.
 ---
 
 ## 8. Roles, authorities y el prefijo `ROLE_`
