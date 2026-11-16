@@ -128,6 +128,19 @@ public class SecurityConfig {
 }
 ```
 
+> **¿Qué es `@Bean`?** Hasta ahora, para que Spring gestionara una clase nuestra le poníamos `@Component`, `@Service`, `@Repository` o `@Controller`. Pero `SecurityFilterChain`, `BCryptPasswordEncoder` o `InMemoryUserDetailsManager` son clases **de Spring Security**: no podemos abrirlas para anotarlas. Además, hay que configurarlas antes de usarlas.
+>
+> La solución es un **método** anotado con `@Bean` dentro de una clase `@Configuration`. Spring lo ejecuta **una vez** al arrancar, guarda el objeto que devuelve en su contenedor y lo inyecta donde se necesite, igual que cualquier otro componente.
+>
+> | | `@Component` / `@Service` / `@Repository` | `@Bean` |
+> |---|---|---|
+> | Se pone en | La **clase** | Un **método** de una clase `@Configuration` |
+> | Quién crea el objeto | Spring, con el constructor | Nosotros, en el método (`return new ...`) |
+> | Cuándo se usa | Clases **nuestras** | Clases **de terceros** o que hay que configurar al crearlas |
+> | Ejemplo en el proyecto | `LibroService`, `AutorRepositoryJdbc` | `SecurityFilterChain`, `PasswordEncoder` |
+>
+> El resultado es el mismo: un componente gestionado por Spring que se puede inyectar.
+
 | Bloque | Filtro que configura | Qué hace aquí |
 |---|---|---|
 | `authorizeHttpRequests` | `AuthorizationFilter` | Abre la portada, `/error`, los CSS, Bootstrap y la consola H2. El resto exige login. |
@@ -268,7 +281,10 @@ public UserDetailsService usuariosEnMemoria(PasswordEncoder passwordEncoder) {
 | `User.builder()` | Clase de Spring Security que implementa `UserDetails`. |
 | `.roles("ADMIN")` | Crea la authority `ROLE_ADMIN` (añade el prefijo). |
 
+> Fíjate en `usuariosEnMemoria(PasswordEncoder passwordEncoder)`: un método `@Bean` también puede **recibir componentes por parámetro**. Spring le inyecta el `PasswordEncoder` declarado justo encima, igual que haría con un constructor.
+
 Con estos dos beans, Spring Boot ya sabe autenticar. **No hace falta** declarar `AuthenticationProvider` ni `AuthenticationManager`.
+
 
 ### Comprueba
 
