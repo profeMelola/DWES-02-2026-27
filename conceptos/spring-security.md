@@ -461,13 +461,92 @@ Spring Security 7 (incluido en Spring Boot 4) **eliminó** muchas formas antigua
 
 ## 13. Preguntas de repaso
 
-1. Un usuario con rol USER intenta borrar un libro. ¿Qué falla, la autenticación o la autorización? ¿Qué código HTTP recibe?
-2. Un usuario sin identificar pide `/libros`. ¿Ve un 401? ¿Por qué?
-3. Ejecutas dos veces `passwordEncoder.encode("1234")` y obtienes resultados distintos. ¿Es un error? ¿Cómo se comprueba entonces la contraseña en el login?
-4. ¿Por qué no basta con guardar el SHA-256 de la contraseña?
-5. En la BD el rol está guardado como `ROLE_ADMIN` y en el `UserDetailsService` usas `.roles(rol)`. ¿Qué pasa?
-6. Tienes estas reglas en este orden: `requestMatchers("/libros/**").authenticated()` y después `requestMatchers("/libros/borrar/**").hasRole("ADMIN")`. ¿Puede borrar un USER? ¿Cómo lo arreglas?
-7. Has ocultado el botón "Borrar" con `sec:authorize`. ¿Está protegido el borrado?
-8. Un formulario con `action="/libros/nuevo"` devuelve 403 al enviarlo, aunque el usuario es ADMIN. ¿Qué ocurre?
-9. ¿Por qué el logout debe hacerse por POST?
-10. Encuentras un ejemplo con `extends WebSecurityConfigurerAdapter` y `.antMatchers(...)`. ¿Te sirve para nuestro proyecto?
+**1.** Un usuario con rol USER intenta borrar un libro. ¿Qué falla, la autenticación o la autorización? ¿Qué código HTTP recibe?
+
+<details>
+<summary>Ver respuesta</summary>
+
+Falla la **autorización**: sabemos quién es, pero no tiene permiso. Recibe un **403**.
+
+</details>
+
+**2.** Un usuario sin identificar pide `/libros`. ¿Ve un 401? ¿Por qué?
+
+<details>
+<summary>Ver respuesta</summary>
+
+No. En una aplicación MVC con formulario de login, Spring Security **redirige (302) a `/login`**. El 401 lo veremos en la API REST, donde no hay pantalla de login.
+
+</details>
+
+**3.** Ejecutas dos veces `passwordEncoder.encode("1234")` y obtienes resultados distintos. ¿Es un error? ¿Cómo se comprueba entonces la contraseña en el login?
+
+<details>
+<summary>Ver respuesta</summary>
+
+No es un error: BCrypt añade una **sal aleatoria** distinta cada vez y la guarda dentro del hash. Se comprueba con `matches(contraseña, hash)`, nunca con `equals`.
+
+</details>
+
+**4.** ¿Por qué no basta con guardar el SHA-256 de la contraseña?
+
+<details>
+<summary>Ver respuesta</summary>
+
+Porque es **muy rápido** (se pueden probar miles de millones de contraseñas por segundo) y, sin sal, la misma contraseña da siempre el mismo hash, así que sirven las tablas precalculadas. BCrypt es lento a propósito y lleva sal.
+
+</details>
+
+**5.** En la BD el rol está guardado como `ROLE_ADMIN` y en el `UserDetailsService` usas `.roles(rol)`. ¿Qué pasa?
+
+<details>
+<summary>Ver respuesta</summary>
+
+Spring lanza una **excepción**: `roles()` añade el prefijo `ROLE_` por su cuenta y no admite valores que ya lo lleven. Convención de clase: en la BD, `ADMIN` sin prefijo.
+
+</details>
+
+**6.** Tienes estas reglas en este orden: `requestMatchers("/libros/**").authenticated()` y después `requestMatchers("/libros/borrar/**").hasRole("ADMIN")`. ¿Puede borrar un USER? ¿Cómo lo arreglas?
+
+<details>
+<summary>Ver respuesta</summary>
+
+**Sí puede**: gana la primera regla que coincide, y `/libros/**` incluye `/libros/borrar/...`. Se arregla poniendo la regla concreta (`/libros/borrar/**`) **antes** que la general.
+
+</details>
+
+**7.** Has ocultado el botón "Borrar" con `sec:authorize`. ¿Está protegido el borrado?
+
+<details>
+<summary>Ver respuesta</summary>
+
+**No.** Ocultar el botón es comodidad para el usuario: la URL sigue existiendo y se puede pedir a mano. La protección real es `hasRole("ADMIN")` en la `SecurityFilterChain`.
+
+</details>
+
+**8.** Un formulario con `action="/libros/nuevo"` devuelve 403 al enviarlo, aunque el usuario es ADMIN. ¿Qué ocurre?
+
+<details>
+<summary>Ver respuesta</summary>
+
+Falta el **token CSRF**. Thymeleaf solo lo añade cuando se usa `th:action`. Solución: `th:action="@{/libros/nuevo}"`.
+
+</details>
+
+**9.** ¿Por qué el logout debe hacerse por POST?
+
+<details>
+<summary>Ver respuesta</summary>
+
+Porque así va protegido por CSRF. Si fuera GET, cualquier web podría cerrarte la sesión con algo tan simple como `<img src=".../logout">`.
+
+</details>
+
+**10.** Encuentras un ejemplo con `extends WebSecurityConfigurerAdapter` y `.antMatchers(...)`. ¿Te sirve para nuestro proyecto?
+
+<details>
+<summary>Ver respuesta</summary>
+
+**No.** Las dos cosas están eliminadas en Spring Security 7, así que ese código no compila. Además, indica que el ejemplo es de una versión antigua: desconfía también del resto.
+
+</details>
