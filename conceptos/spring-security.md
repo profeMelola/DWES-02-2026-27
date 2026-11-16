@@ -309,19 +309,52 @@ El `UserDetailsService` actúa como **adaptador**: convierte nuestro objeto en e
 
 ## 8. Roles, authorities y el prefijo `ROLE_`
 
-Para Spring Security, un usuario tiene una lista de **authorities** (permisos): simples cadenas de texto. Un **rol** es una authority que, por convención, empieza por `ROLE_`.
+### La idea
 
-| Escribes | Spring guarda / busca |
+Para Spring Security, un usuario tiene una lista de **authorities** (permisos), que son simples cadenas de texto. Un **rol** es una authority que, por convención, empieza por `ROLE_`.
+
+En la base de datos guardamos `ADMIN`, pero Spring trabaja con `ROLE_ADMIN`. Alguien tiene que añadir el prefijo.
+
+### Cómo lo hacemos en clase
+
+Hay una única forma, y es la de la práctica guiada:
+
+| Dónde | Qué escribimos | Qué hace Spring |
+|---|---|---|
+| Base de datos (`data.sql`) | `'ADMIN'`, `'USER'` (**sin** prefijo) | — |
+| `UsuarioDetailsService` | `.roles(usuario.getRol())` | **Añade** el prefijo: authority `ROLE_ADMIN` |
+| `SecurityConfig` | `.hasRole("ADMIN")` | **Añade** el prefijo y busca `ROLE_ADMIN` |
+| Vistas | `sec:authorize="hasRole('ADMIN')"` | **Añade** el prefijo y busca `ROLE_ADMIN` |
+
+```
+BD: 'ADMIN'  ──.roles()──▶  authority 'ROLE_ADMIN'  ◀──busca──  hasRole("ADMIN")   ✅ coinciden
+```
+
+```java
+return User.builder()
+        .username(usuario.getUsername())
+        .password(usuario.getPassword())
+        .roles(usuario.getRol())          // 'ADMIN' → authority 'ROLE_ADMIN'
+        .disabled(!usuario.isActivo())
+        .build();
+```
+
+**Regla de clase:** nunca escribimos `ROLE_` a mano. Ni en la BD ni en el código: lo pone siempre Spring.
+
+### Errores al mezclar
+
+| Error | Qué pasa |
 |---|---|
-| `User.builder().roles("ADMIN")` | authority `ROLE_ADMIN` (añade el prefijo) |
-| `User.builder().authorities("ROLE_ADMIN")` | authority `ROLE_ADMIN` (tal cual) |
-| `.hasRole("ADMIN")` | busca `ROLE_ADMIN` (añade el prefijo) |
-| `.hasAuthority("ROLE_ADMIN")` | busca `ROLE_ADMIN` (tal cual) |
-| `sec:authorize="hasRole('ADMIN')"` | busca `ROLE_ADMIN` |
+| Guardar `'ROLE_ADMIN'` en la BD y usar `.roles(...)` | **Excepción** al hacer login: `roles()` añade el prefijo y no admite que ya venga puesto. |
+| Usar `.authorities(...)` en vez de `.roles(...)` | El usuario tiene la authority `ADMIN`, sin prefijo. `hasRole("ADMIN")` busca `ROLE_ADMIN` → **403 para todos**. |
 
-**Convención en clase:** en la base de datos guardamos el rol **sin prefijo** (`ADMIN`, `USER`) y usamos siempre `roles(...)` y `hasRole(...)`.
+### Otras formas que verás (no las usamos)
 
-> Error típico: guardar `ROLE_ADMIN` en la BD y usar `roles(...)`. Spring lanza una excepción porque el valor ya empieza por `ROLE_`. Y si lo mezclas al revés (`authorities("ADMIN")` + `hasRole("ADMIN")`), nadie tiene permiso: busca `ROLE_ADMIN` y el usuario tiene `ADMIN`.
+En tutoriales, proyectos antiguos y código generado por IA es muy habitual **guardar el prefijo en la BD** (`'ROLE_ADMIN'`) y crear la authority tal cual, con `.authorities(rol)`, `new SimpleGrantedAuthority(rol)` o una lambda `() -> rol`. También funciona: el prefijo lo pone la BD en vez de Spring.
+
+También existe `hasAuthority("ROLE_ADMIN")`, que compara la cadena exacta sin añadir nada.
+
+> Si te encuentras estas variantes, no están mal. Pero en un mismo proyecto el prefijo lo pone **un solo sitio**. En clase, ese sitio es Spring, con `roles()` y `hasRole()`.
 
 ### Reglas de autorización: el orden importa
 
