@@ -24,6 +24,7 @@ En esta unidad damos el salto de Servlet/JSP a **Spring Boot + Spring MVC + Thym
 - [SOLID y Patrones](./conceptos/SOLID-y-patrones.md)
 - [Patron PRG](./conceptos/patron-PRG.md)
 - [Chuleta Thymeleaf](./conceptos/chuleta-thymeleaf.md)
+- [Spring Security](./conceptos/spring-security.md)
 
 ## Práctica
 [Ejercicios](./ejercicios/readme.md)
