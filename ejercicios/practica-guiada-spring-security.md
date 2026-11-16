@@ -54,7 +54,12 @@ Recarga `/libros`: *Bestiario* ha desaparecido.
 
 ## Paso 1: añadir solo la dependencia
 
-En el `pom.xml`, dentro de `<dependencies>`:
+Lo mejor es añadir el starter:
+
+<img width="448" height="344" alt="imagen" src="https://github.com/user-attachments/assets/99158c8d-3493-4d53-be4f-be84233ae683" />
+
+
+O añadir directamente en el `pom.xml`, dentro de `<dependencies>`:
 
 ```xml
 <!-- Spring Security -->
