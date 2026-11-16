@@ -41,6 +41,15 @@ En clase trabajamos con las últimas versiones, pero en el mundo real gran parte
 - **Que funcione no es suficiente.** Una solución que funciona no garantiza el aprobado.
 - **Tendréis que defender lo que entregáis.** Explicar cómo funciona y modificarlo en directo, sin IA. Si no sabes explicar tu código, ese código no cuenta como tuyo.
 
+## Posible formato: sin IA y con IA en la misma prueba
+
+Es posible que en la 2ª evaluación las dos pruebas prácticas se hagan en un mismo examen, en dos fases:
+
+1. **Sin internet: revisar como programadores.** Partiréis de un proyecto supuestamente generado con IA. Tendréis que leerlo, entenderlo y detectar sus problemas: capas lógicas mal implementadas, patrones mal aplicados, errores en la base de datos, fallos de seguridad, bugs... Entregaréis un informe con los fallos encontrados, dónde están y cómo los corregiríais.
+2. **Con IA: corregir con eficiencia.** Una vez entregado el informe, usaréis la IA para implementar las correcciones y mejoras que habéis propuesto. La IA os ayuda a corregir lo que vosotros habéis detectado.
+
+Es lo que se hace en una empresa: revisar código ajeno o generado, decidir qué falla y por qué, y después usar las herramientas para resolverlo rápido.
+
 ## Conclusión
 
 El criterio para usar la IA de forma eficiente solo se adquiere programando sin ella.
