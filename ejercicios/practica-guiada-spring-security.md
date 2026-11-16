@@ -80,7 +80,7 @@ Recarga Maven y arranca. **No escribas ni una línea de código.** Observa:
 | Borrar desde el botón de la aplicación | **Sí funciona**: Thymeleaf añade solo el token CSRF a los formularios con `th:action`. |
 | `http://localhost:8080/h2-console` | Bloqueada. Lo arreglamos en el paso 2. |
 
-> **Para pensar.** El `curl` falla por dos motivos a la vez: no tiene sesión y no envía token CSRF. ¿Cuál de los dos comprueba antes Spring Security? (Pista: mira el orden de los filtros en la teoría.)
+> **Para pensar.** El `curl` falla por dos motivos a la vez: no tiene sesión y no envía token CSRF. ¿Cuál de los dos comprueba antes Spring Security? (Pista: mira el orden de los [filtros en la teoría](https://github.com/profeMelola/DWES-02-2026-27/blob/main/conceptos/spring-security.md#6-la-cadena-de-filtros).)
 
 Esto es lo que hace Spring Security **por defecto**: todo cerrado. A partir de aquí, nuestro trabajo es **abrir** lo público y **decidir** quién puede hacer qué.
 
