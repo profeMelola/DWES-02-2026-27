@@ -24,11 +24,10 @@ La contraseña de los tres usuarios es `1234`.
 | [0](#paso-0-destripar-la-aplicación-sin-seguridad) | Destripar la aplicación sin seguridad | Por qué hace falta |
 | [1](#paso-1-añadir-solo-la-dependencia) | Añadir solo la dependencia | Comportamiento por defecto |
 | [2](#paso-2-securityfilterchain-y-login-propio) | `SecurityFilterChain` y login propio | Rutas públicas, login, logout, CSRF |
-| [3](#paso-3-usuarios-en-memoria-con-bcrypt) | Usuarios en memoria con BCrypt | `UserDetailsService`, `PasswordEncoder` |
-| [4](#paso-4-usuarios-y-roles-en-h2-con-jdbc) | Usuarios y roles en H2 con JDBC | Nuestro `UserDetailsService` (SRP) |
-| [5](#paso-5-autorización-admin-y-user) | Autorización ADMIN / USER | `hasRole`, orden de las reglas, 403 |
-| [6](#paso-6-vistas-secauthorize-y-página-403) | Vistas: `sec:authorize` y página 403 | Ocultar no es proteger |
-| [7](#paso-7-tests-con-mockmvc-y-withmockuser) | Tests con MockMvc y `@WithMockUser` | Comprobar la seguridad sin navegador |
+| [3](#paso-3-nuestros-usuarios-y-nuestro-userdetailsservice) | Nuestros usuarios y nuestro `UserDetailsService` | BCrypt, modelo, repositorio y adaptador (SRP, ISP, DIP) |
+| [4](#paso-4-autorización-admin-y-user) | Autorización ADMIN / USER | `hasRole`, orden de las reglas, 403 |
+| [5](#paso-5-vistas-secauthorize-y-página-403) | Vistas: `sec:authorize` y página 403 | Ocultar no es proteger |
+| [6](#paso-6-tests-con-mockmvc-y-withmockuser) | Tests con MockMvc y `@WithMockUser` | Comprobar la seguridad sin navegador |
 
 > Como en el resto del material, el código Java va **sin `package` ni `import`**. Cuando IntelliJ te ofrezca varias clases con el mismo nombre, consulta la [tabla de imports](#imports-que-pueden-confundir) del final.
 
@@ -128,7 +127,7 @@ public class SecurityConfig {
 }
 ```
 
-> **¿Qué es `@Bean`?** Hasta ahora, para que Spring gestionara una clase nuestra le poníamos `@Component`, `@Service`, `@Repository` o `@Controller`. Pero `SecurityFilterChain`, `BCryptPasswordEncoder` o `InMemoryUserDetailsManager` son clases **de Spring Security**: no podemos abrirlas para anotarlas. Además, hay que configurarlas antes de usarlas.
+> **¿Qué es `@Bean`?** Hasta ahora, para que Spring gestionara una clase nuestra le poníamos `@Component`, `@Service`, `@Repository` o `@Controller`. Pero `SecurityFilterChain` o `BCryptPasswordEncoder` son clases **de Spring Security**: no podemos abrirlas para anotarlas. Además, hay que configurarlas antes de usarlas.
 >
 > La solución es un **método** anotado con `@Bean` dentro de una clase `@Configuration`. Spring lo ejecuta **una vez** al arrancar, guarda el objeto que devuelve en su contenedor y lo inyecta donde se necesite, igual que cualquier otro componente.
 >
@@ -227,7 +226,7 @@ Para poder cerrar sesión mientras probamos, añade en `fragments/layout.html`, 
 
 > **¿Por qué un formulario y no un enlace?** Porque un enlace es GET y CSRF solo protege POST, PUT y DELETE. Con un GET, cualquier web podría cerrarte la sesión con algo tan simple como `<img src="http://localhost:8080/logout">`.
 
-En el paso 6 este botón solo se verá cuando haya alguien identificado.
+En el paso 5 este botón solo se verá cuando haya alguien identificado.
 
 ### Comprueba
 
@@ -244,120 +243,40 @@ En el paso 6 este botón solo se verá cuando haya alguien identificado.
 
 ---
 
-## Paso 3: usuarios en memoria con BCrypt
+## Paso 3: nuestros usuarios y nuestro `UserDetailsService`
 
-El usuario `user` con contraseña aleatoria no sirve. Vamos a definir nuestros usuarios, primero en memoria.
-
-Añade a `SecurityConfig` dos beans:
-
-```java
-@Bean
-public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-}
-
-@Bean
-public UserDetailsService usuariosEnMemoria(PasswordEncoder passwordEncoder) {
-    UserDetails admin = User.builder()
-            .username("admin")
-            .password(passwordEncoder.encode("1234"))
-            .roles("ADMIN")
-            .build();
-
-    UserDetails ana = User.builder()
-            .username("ana")
-            .password(passwordEncoder.encode("1234"))
-            .roles("USER")
-            .build();
-
-    return new InMemoryUserDetailsManager(admin, ana);
-}
-```
-
-| Pieza | Qué hace |
-|---|---|
-| `PasswordEncoder` | Spring lo usa para comparar la contraseña escrita con el hash guardado (`matches`). |
-| `UserDetailsService` | Le dice a Spring dónde buscar los usuarios. Aquí, en memoria. |
-| `User.builder()` | Clase de Spring Security que implementa `UserDetails`. |
-| `.roles("ADMIN")` | Crea la authority `ROLE_ADMIN` (añade el prefijo). |
-
-> Fíjate en `usuariosEnMemoria(PasswordEncoder passwordEncoder)`: un método `@Bean` también puede **recibir componentes por parámetro**. Spring le inyecta el `PasswordEncoder` declarado justo encima, igual que haría con un constructor.
-
-Con estos dos beans, Spring Boot ya sabe autenticar. **No hace falta** declarar `AuthenticationProvider` ni `AuthenticationManager`.
-
-
-### Comprueba
-
-- Al arrancar, **ya no aparece** "Using generated security password": Spring ve que tenemos nuestro propio `UserDetailsService`.
-- Entra como `admin` / `1234` y como `ana` / `1234`.
-- Entra como `ana` y **borra un libro**. Funciona.
-
-> **Para pensar.** `ana` es USER y ha podido borrar. ¿Ha fallado la autenticación o la autorización? (Respuesta: ninguna de las dos. Todavía no hemos escrito ninguna regla de autorización: solo pedimos estar autenticado.)
-
-> **Para pensar.** Añade temporalmente un `System.out.println(passwordEncoder.encode("1234"));` dentro del método y arranca dos veces. ¿Sale el mismo hash? ¿Por qué el login sigue funcionando?
-
----
-
-## Paso 4: usuarios y roles en H2 con JDBC
-
-Los usuarios en memoria se pierden al cambiar el código y no se pueden gestionar. Los pasamos a la base de datos **con las mismas capas que el resto de la aplicación**:
+El usuario `user` con contraseña aleatoria no sirve. Vamos a tener **nuestros propios usuarios**, organizados por capas como el resto de la aplicación: un modelo `Usuario`, un repositorio con interfaz y un servicio que **adapta** nuestro `Usuario` a lo que espera Spring Security.
 
 ```
 UsuarioDetailsService (service)  ──usa──▶  UsuarioRepository (interfaz)
         │                                          ▲
         │ devuelve User (UserDetails)              │ implementa
         ▼                                          │
-  Spring Security                       UsuarioRepositoryJdbc ──▶ H2 (tabla usuario)
+  Spring Security                       UsuarioRepositoryMemoria (lista en memoria)
 ```
 
-### 4.1 La tabla
+> **¿Y la base de datos?** De momento los usuarios están en una lista. En la UT04, con JPA, crearemos otra implementación de `UsuarioRepository` que lea de la BD. **Solo cambiará esa clase**: el servicio y la configuración de seguridad no se tocarán.
 
-En `schema.sql`, añade el `DROP` **al principio**, junto a los otros:
+### 3.1 El `PasswordEncoder`
 
-```sql
-DROP TABLE IF EXISTS usuario;
+Añade a `SecurityConfig` este bean:
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
 ```
 
-Y la tabla **al final**:
+Spring lo usa en cada login para comparar la contraseña escrita con el hash guardado (`matches`). Nunca guardamos contraseñas en claro: solo su hash BCrypt (ver el apartado 5 de la teoría).
 
-```sql
--- Usuarios de la aplicación (Spring Security)
--- password: hash BCrypt (60 caracteres), nunca la contraseña en claro
--- rol: sin prefijo ROLE_ (lo añade Spring con roles(...))
-CREATE TABLE usuario (
-                       id       INT          AUTO_INCREMENT PRIMARY KEY,
-                       username VARCHAR(50)  NOT NULL,
-                       password VARCHAR(60)  NOT NULL,
-                       rol      VARCHAR(20)  NOT NULL,
-                       activo   BOOLEAN      NOT NULL DEFAULT TRUE,
-                       CONSTRAINT uq_usuario_username UNIQUE (username),
-                       CONSTRAINT ck_usuario_rol CHECK (rol IN ('ADMIN', 'USER'))
-);
-```
-
-> **¿Por qué un solo rol por usuario?** Para varios roles haría falta una relación N:M (tablas `usuario`, `rol` y `usuario_rol`). La dejamos para JPA en la UT04. Con un rol por usuario tenemos de sobra para esta aplicación.
-
-### 4.2 Los datos
-
-Al final de `data.sql`:
-
-```sql
--- Usuarios. La contraseña de los tres es 1234 (guardada como hash BCrypt).
--- Aunque la contraseña es la misma, los hashes son distintos: cada uno lleva su propia sal.
-INSERT INTO usuario (username, password, rol, activo) VALUES ('admin', '$2a$10$FE6Xa2yaXAVUf9v7DDQoF.bjxEGeJujmNH7o5T91IUG3qjc3z05Py', 'ADMIN', TRUE);
-INSERT INTO usuario (username, password, rol, activo) VALUES ('ana',   '$2a$10$07vZe7nhH1Oehrm51orcpeer3uYX1JPi5lLBWb.HW.JMX.llYoIaK', 'USER',  TRUE);
-INSERT INTO usuario (username, password, rol, activo) VALUES ('luis',  '$2a$10$EQIZl.C1bGRS.QitQ.2aPuM62n.iRSiiLBqTCIUwFC21c9U9FPdyK', 'USER',  FALSE);
-```
-
-> **¿Y si quiero otra contraseña?** Genera el hash con el `System.out.println(passwordEncoder.encode("..."))` del paso 3 y cópialo. En la BD **nunca** se escribe la contraseña en claro: si pones `'1234'`, el login fallará y en la consola verás el aviso `Encoded password does not look like BCrypt`.
-
-### 4.3 El modelo
+### 3.2 El modelo
 
 `model/Usuario.java`:
 
 ```java
 /**
- * Fila de la tabla USUARIO.
+ * Usuario de la biblioteca.
  * POJO sin dependencias de Spring Security: NO implementa UserDetails.
  * La traducción a UserDetails la hace UsuarioDetailsService (SRP).
  */
@@ -374,7 +293,7 @@ public class Usuario {
 }
 ```
 
-### 4.4 El repositorio
+### 3.3 El repositorio: la interfaz
 
 `repository/UsuarioRepository.java`:
 
@@ -391,48 +310,60 @@ public interface UsuarioRepository {
 
 > **SOLID: principio de segregación de interfaces (ISP).** `LibroRepository` y `AutorRepository` extienden `GenericRepository` porque necesitan el CRUD completo. `UsuarioRepository` solo necesita buscar por nombre. Obligarle a implementar `save`, `update` y `delete` sería añadir métodos que nadie usa.
 
-`repository/UsuarioRepositoryJdbc.java`, con el mismo estilo que `AutorRepositoryJdbc`:
+### 3.4 El repositorio: implementación en memoria
+
+`repository/UsuarioRepositoryMemoria.java`:
 
 ```java
+/**
+ * Usuarios en memoria. En la UT04 se sustituirá por una implementación con JPA.
+ * Contraseña de los tres: 1234 (guardada como hash BCrypt).
+ */
 @Repository
-@RequiredArgsConstructor
-public class UsuarioRepositoryJdbc implements UsuarioRepository {
+public class UsuarioRepositoryMemoria implements UsuarioRepository {
 
-    private final DataSource dataSource;
+    private final List<Usuario> usuarios = List.of(
+            new Usuario(1, "admin", "$2a$10$FE6Xa2yaXAVUf9v7DDQoF.bjxEGeJujmNH7o5T91IUG3qjc3z05Py", "ADMIN", true),
+            new Usuario(2, "ana",   "$2a$10$07vZe7nhH1Oehrm51orcpeer3uYX1JPi5lLBWb.HW.JMX.llYoIaK", "USER",  true),
+            new Usuario(3, "luis",  "$2a$10$EQIZl.C1bGRS.QitQ.2aPuM62n.iRSiiLBqTCIUwFC21c9U9FPdyK", "USER",  false)
+    );
 
     @Override
     public Optional<Usuario> findByUsername(String username) {
-        String sql = "SELECT id, username, password, rol, activo FROM usuario WHERE username = ?";
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new AccesoDatosException("Error al buscar el usuario " + username, e);
-        }
-    }
-
-    private Usuario mapRow(ResultSet rs) throws SQLException {
-        return new Usuario(
-                rs.getInt("id"),
-                rs.getString("username"),
-                rs.getString("password"),
-                rs.getString("rol"),
-                rs.getBoolean("activo"));
+        return usuarios.stream()
+                .filter(u -> u.getUsername().equals(username))
+                .findFirst();
     }
 }
 ```
 
-### 4.5 Nuestro `UserDetailsService`
+Fíjate:
+
+- La contraseña de los tres es `1234`, pero los **hashes son distintos**: cada uno lleva su propia sal.
+- `luis` está **desactivado** (`activo = false`).
+- Los roles van **sin** prefijo `ROLE_`.
+
+> **¿Y si quiero otra contraseña?** Genera el hash cambiando temporalmente el bean del paso 3.1:
+>
+> ```java
+> @Bean
+> public PasswordEncoder passwordEncoder() {
+>     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+>     System.out.println(encoder.encode("1234"));   // copia el hash de la consola
+>     return encoder;
+> }
+> ```
+>
+> Arranca dos veces: ¿sale el mismo hash? **Nunca** escribas la contraseña en claro en la lista: si pones `"1234"`, el login fallará y en la consola verás el aviso `Encoded password does not look like BCrypt`.
+
+### 3.5 Nuestro `UserDetailsService`
 
 `service/UsuarioDetailsService.java`:
 
 ```java
 /**
  * Adaptador entre nuestro modelo y Spring Security:
- * busca el Usuario en la BD y lo devuelve como UserDetails.
+ * busca el Usuario y lo devuelve como UserDetails.
  */
 @Service
 @RequiredArgsConstructor
@@ -461,29 +392,36 @@ Lo que hace Spring con esta clase en cada login:
 2. Si no existe → `UsernameNotFoundException` → `/login?error`.
 3. Si existe pero está desactivado → `/login?error`.
 4. Compara la contraseña escrita con el hash usando `passwordEncoder.matches(...)`.
-5. Si coincide → guarda el usuario en el `SecurityContext` y este en la sesión.
+5. Si coincide → guarda el usuario en el `SecurityContext`, y este en la sesión.
+
+Con este servicio y el `PasswordEncoder`, Spring Boot ya sabe autenticar. **No hace falta** declarar `AuthenticationProvider` ni `AuthenticationManager`.
 
 > **SOLID: responsabilidad única (SRP).** `Usuario` no implementa `UserDetails`. Representar un usuario de la biblioteca y adaptarlo a Spring Security son dos responsabilidades, y cada una tiene su clase. `UsuarioDetailsService` hace de **adaptador**. (Ver el apartado 7 de la teoría.)
 
-### 4.6 ¡Borra los usuarios en memoria!
+> **SOLID: inversión de dependencias (DIP).** El servicio depende de la **interfaz** `UsuarioRepository`, no de `UsuarioRepositoryMemoria`. Por eso en la UT04 podremos cambiar la lista por una base de datos sin tocarlo.
 
-Elimina de `SecurityConfig` el bean `usuariosEnMemoria`. **Deja** el `PasswordEncoder`.
-
-> ⚠️ **Error típico.** Si dejas los dos `UserDetailsService` (el de memoria y el nuestro), Spring Boot no sabe cuál usar y **no configura la autenticación**: ningún login funcionará. Debe haber **uno solo**.
+> ⚠️ **Error típico.** Debe haber **un solo** `UserDetailsService`. Si declaras otro (por ejemplo, copiando un ejemplo de internet con `InMemoryUserDetailsManager`), Spring Boot no sabe cuál usar y **no configura la autenticación**: ningún login funcionará.
 
 ### Comprueba
 
+> ⚠️ **¿Sigues dentro sin haber hecho login?** Si en el paso 2 entraste como `user`, tu sesión sigue viva: DevTools guarda las sesiones entre reinicios y Spring Security no vuelve a comprobar al usuario en cada petición, se fía de la sesión. Pulsa **Salir** (o usa una ventana de incógnito).
+
 | Prueba | Resultado esperado |
 |---|---|
+| Arrancar | **Ya no aparece** "Using generated security password": Spring ve que tenemos nuestro propio `UserDetailsService`. |
 | `admin` / `1234` | Entra. |
 | `ana` / `1234` | Entra. |
-| `luis` / `1234` | **No entra**: está desactivado (`activo = FALSE`). |
-| `pepe` / `1234` | No entra: no existe. Mismo mensaje que con contraseña mala. |
-| Consola H2: `SELECT * FROM usuario;` | Tres hashes distintos para la misma contraseña. |
+| `luis` / `1234` | **No entra**: está desactivado. |
+| `pepe` / `1234` | No entra: no existe. Mismo mensaje que con la contraseña mala. |
+| `ana` borra un libro | **Funciona**. Lo arreglamos en el paso 4. |
+
+> **Para pensar.** `ana` es USER y ha podido borrar. ¿Ha fallado la autenticación o la autorización? (Respuesta: ninguna de las dos. Todavía no hemos escrito ninguna regla de autorización: solo pedimos estar autenticado.)
+
+> **Para pensar.** Pon un punto de ruptura (*breakpoint*) en `loadUserByUsername` y haz login. Navega después por varias páginas: ¿se vuelve a ejecutar? ¿Por qué?
 
 ---
 
-## Paso 5: autorización ADMIN y USER
+## Paso 4: autorización ADMIN y USER
 
 Ya sabemos **quién** es cada uno. Falta decidir **qué puede hacer**. Primero, las rutas de la aplicación:
 
@@ -534,7 +472,7 @@ Claves:
 | Pulsar el botón de borrar | — | ❌ 403 | ✅ |
 | `/autores/editar/1` | → login | ❌ 403 | ✅ |
 
-De momento, el 403 muestra la página de error genérica de la aplicación ("Se ha producido un error inesperado"). Lo mejoramos en el paso 6.
+De momento, el 403 muestra la página de error genérica de la aplicación ("Se ha producido un error inesperado"). Lo mejoramos en el paso 5.
 
 > **Reto 1.** Mueve la regla `.requestMatchers("/libros", "/autores").hasAnyRole(...)` y cámbiala por `.requestMatchers("/libros/**", "/autores/**").hasAnyRole(...)`, colocándola **antes** de las de ADMIN. Entra como `ana` e intenta borrar. ¿Qué pasa? ¿Por qué? Déjalo como estaba.
 
@@ -542,9 +480,9 @@ De momento, el 403 muestra la página de error genérica de la aplicación ("Se 
 
 ---
 
-## Paso 6: vistas, `sec:authorize` y página 403
+## Paso 5: vistas, `sec:authorize` y página 403
 
-### 6.1 La dependencia
+### 5.1 La dependencia
 
 En el `pom.xml`:
 
@@ -572,7 +510,7 @@ En cada plantilla donde uses `sec:`, añade el espacio de nombres a la etiqueta 
 | `sec:authorize="hasRole('ADMIN')"` | Mostrar solo a ADMIN. |
 | `sec:authentication="name"` | Escribir el nombre del usuario. |
 
-### 6.2 La barra de navegación
+### 5.2 La barra de navegación
 
 En `fragments/layout.html`, **sustituye el formulario provisional de logout** del paso 2 por esto:
 
@@ -597,7 +535,7 @@ En `fragments/layout.html`, **sustituye el formulario provisional de logout** de
 </a>
 ```
 
-### 6.3 Ocultar botones a quien no es ADMIN
+### 5.3 Ocultar botones a quien no es ADMIN
 
 En `libros/lista.html`, añade `sec:authorize="hasRole('ADMIN')"` a cinco elementos:
 
@@ -622,7 +560,7 @@ Haz lo mismo en `autores/lista.html` (botón "Añadir autor", cabeceras "Editar"
 
 > Oculta **la cabecera y la celda**. Si ocultas solo una de las dos, la tabla se descuadra.
 
-### 6.4 Página 403
+### 5.4 Página 403
 
 Spring Boot busca automáticamente una plantilla con el código de error en `templates/error/`. Crea `templates/error/403.html`:
 
@@ -662,11 +600,11 @@ Funciona gracias a que en el paso 2 abrimos `/error` con `permitAll()`: Spring S
 
 ---
 
-## Paso 7: tests con MockMvc y `@WithMockUser`
+## Paso 6: tests con MockMvc y `@WithMockUser`
 
-Probar la matriz del paso 5 a mano con tres usuarios es lento y fácil de olvidar. Lo automatizamos.
+Probar la matriz del paso 4 a mano con tres usuarios es lento y fácil de olvidar. Lo automatizamos.
 
-### 7.1 Dependencias
+### 6.1 Dependencias
 
 En el `pom.xml`:
 
@@ -692,7 +630,7 @@ En el `pom.xml`:
 </dependency>
 ```
 
-### 7.2 La clase de test
+### 6.2 La clase de test
 
 Crea `src/test/java/es/daw/bibliotecajdbc/SeguridadTest.java`:
 
@@ -755,10 +693,10 @@ class SeguridadTest {
                 .andExpect(status().isForbidden());
     }
 
-    // ---------- Autenticación real (UserDetailsService + BCrypt + H2) ----------
+    // ---------- Autenticación real (UsuarioDetailsService + BCrypt + repositorio) ----------
 
     @Test
-    void loginCorrectoConUsuarioDeLaBaseDeDatos() throws Exception {
+    void loginCorrectoConUsuarioDelRepositorio() throws Exception {
         mockMvc.perform(formLogin("/login").user("admin").password("1234"))
                 .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"));
     }
@@ -780,9 +718,9 @@ class SeguridadTest {
 | Herramienta | Qué hace |
 |---|---|
 | `@SpringBootTest` + `@AutoConfigureMockMvc` | Arranca la aplicación completa (con H2 y la seguridad) y nos da un `MockMvc` para lanzar peticiones sin servidor ni navegador. |
-| `@WithMockUser(roles = "USER")` | Simula un usuario **ya autenticado** con ese rol. **No** pasa por nuestro `UsuarioDetailsService` ni por la BD: prueba solo la **autorización**. |
+| `@WithMockUser(roles = "USER")` | Simula un usuario **ya autenticado** con ese rol. **No** pasa por nuestro `UsuarioDetailsService`: prueba solo la **autorización**. |
 | `.with(csrf())` | Añade un token CSRF válido a la petición, como haría Thymeleaf. |
-| `formLogin("/login").user(...).password(...)` | Hace un login **de verdad**: usa nuestro `UsuarioDetailsService`, BCrypt y los datos de `data.sql`. Prueba la **autenticación**. |
+| `formLogin("/login").user(...).password(...)` | Hace un login **de verdad**: usa nuestro `UsuarioDetailsService`, BCrypt y los usuarios de `UsuarioRepositoryMemoria`. Prueba la **autenticación**. |
 | `authenticated()` / `unauthenticated()` | Comprueban si, tras la petición, hay alguien autenticado. |
 
 > **¿Por qué `redirectedUrlPattern("**/login")` y no `redirectedUrl("/login")`?** Según la versión, Spring Security redirige con la URL completa (`http://localhost/login`) o relativa (`/login`). El patrón vale para las dos.
@@ -791,7 +729,7 @@ Ejecuta los tests desde IntelliJ (botón ▶ junto a la clase) o con `./mvnw tes
 
 > **Reto 4.** Rompe la seguridad a propósito y mira qué test falla:
 > - Cambia `.hasRole("ADMIN")` por `.authenticated()` en la regla de libros.
-> - Pon `TRUE` en el `activo` de `luis`.
+> - Pon `true` en el `activo` de `luis` en `UsuarioRepositoryMemoria`.
 > - Cambia en `UsuarioDetailsService` `.roles(...)` por `.authorities(...)`.
 >
 > Para cada cambio: ¿qué test falla y por qué? ¿Lo habrías detectado probando a mano?
@@ -803,27 +741,24 @@ Ejecuta los tests desde IntelliJ (botón ▶ junto a la clase) o con `./mvnw tes
 ## Resumen: qué ficheros hemos tocado
 
 ```
-pom.xml                                 + security, thymeleaf-extras, tests; − maven.test.skip
+pom.xml                                    + security, thymeleaf-extras, tests; − maven.test.skip
 src/main/java/es/daw/bibliotecajdbc/
 ├── config/
-│   ├── SecurityConfig.java             NUEVO  (pasos 2, 3, 5)
-│   └── WebConfig.java                  + vista /login
-├── model/Usuario.java                  NUEVO  (paso 4)
+│   ├── SecurityConfig.java                NUEVO  (pasos 2, 3, 4)
+│   └── WebConfig.java                     + vista /login
+├── model/Usuario.java                     NUEVO  (paso 3)
 ├── repository/
-│   ├── UsuarioRepository.java          NUEVO  (paso 4)
-│   └── UsuarioRepositoryJdbc.java      NUEVO  (paso 4)
-└── service/UsuarioDetailsService.java  NUEVO  (paso 4)
-src/main/resources/
-├── schema.sql                          + tabla usuario
-├── data.sql                            + 3 usuarios con hash BCrypt
-└── templates/
-    ├── login.html                      NUEVO  (paso 2)
-    ├── error/403.html                  NUEVO  (paso 6)
-    ├── fragments/layout.html           + usuario en la barra y logout (pasos 2 y 6)
-    ├── libros/lista.html               + sec:authorize (paso 6)
-    └── autores/lista.html              + sec:authorize (paso 6)
+│   ├── UsuarioRepository.java             NUEVO  (paso 3)
+│   └── UsuarioRepositoryMemoria.java      NUEVO  (paso 3)
+└── service/UsuarioDetailsService.java     NUEVO  (paso 3)
+src/main/resources/templates/
+├── login.html                             NUEVO  (paso 2)
+├── error/403.html                         NUEVO  (paso 5)
+├── fragments/layout.html                  + usuario en la barra y logout (pasos 2 y 5)
+├── libros/lista.html                      + sec:authorize (paso 5)
+└── autores/lista.html                     + sec:authorize (paso 5)
 src/test/java/es/daw/bibliotecajdbc/
-└── SeguridadTest.java                  NUEVO  (paso 7)
+└── SeguridadTest.java                     NUEVO  (paso 6)
 ```
 
 Fíjate en lo que **no** hemos tocado: ningún controlador, servicio ni repositorio de libros o autores. La seguridad se añade **alrededor** de la aplicación, en los filtros, sin mezclarse con la lógica de negocio.
@@ -832,10 +767,10 @@ Fíjate en lo que **no** hemos tocado: ningún controlador, servicio ni reposito
 
 | Síntoma | Causa probable |
 |---|---|
-| El login no funciona con ningún usuario | Hay dos `UserDetailsService` (no borraste el de memoria) o falta el bean `PasswordEncoder`. |
-| Consola: `Encoded password does not look like BCrypt` | En `data.sql` hay una contraseña en claro en vez del hash. |
+| El login no funciona con ningún usuario | Hay dos `UserDetailsService`, falta el bean `PasswordEncoder` o falta `@Service` en `UsuarioDetailsService`. |
+| Consola: `Encoded password does not look like BCrypt` | En `UsuarioRepositoryMemoria` hay una contraseña en claro en vez del hash. |
 | Un formulario da 403 aunque el usuario tenga permiso | El formulario usa `action` en vez de `th:action`: falta el token CSRF. |
-| Excepción: `ROLE_ADMIN cannot start with ROLE_` | En la BD el rol está guardado con prefijo y usas `.roles(...)`. |
+| Excepción: `ROLE_ADMIN cannot start with ROLE_` | El rol está guardado con prefijo y usas `.roles(...)`. |
 | Nadie tiene permiso aunque el rol es correcto | Mezcla de `.authorities("ADMIN")` con `hasRole("ADMIN")`. |
 | Un USER puede editar o borrar | Una regla general (`/libros/**`) está antes que la concreta de ADMIN. |
 | La página de login sale sin estilos | Falta `/vendor/**` (o `/css/**`) en `permitAll()`. |
@@ -851,7 +786,6 @@ Fíjate en lo que **no** hemos tocado: ningún controlador, servicio ni reposito
 | `UserDetails`, `UserDetailsService`, `UsernameNotFoundException` | `org.springframework.security.core.userdetails` |
 | `PasswordEncoder` | `org.springframework.security.crypto.password.PasswordEncoder` |
 | `BCryptPasswordEncoder` | `org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder` |
-| `InMemoryUserDetailsManager` | `org.springframework.security.provisioning.InMemoryUserDetailsManager` |
 | `SecurityFilterChain` | `org.springframework.security.web.SecurityFilterChain` |
 | `HttpSecurity` | `org.springframework.security.config.annotation.web.builders.HttpSecurity` |
 | `AutoConfigureMockMvc` | `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc` (nuevo paquete en Boot 4) |
