@@ -266,6 +266,8 @@ Lo que hace `matches("1234", hashGuardado)`:
 
 ## 6. La cadena de filtros
 
+> **¿Qué es un filtro?** Una pieza de la especificación Servlet (`jakarta.servlet.Filter`) que se ejecuta **antes** de que la petición llegue al Servlet. Un filtro **no es un Servlet**: el Servlet es el destino que genera la respuesta (en Spring, el `DispatcherServlet`); el filtro es un control en el camino. Cada filtro mira la petición y decide si la deja seguir (`chain.doFilter(...)`) o la corta (redirige al login, responde 403…). Spring Security registra un único filtro en el servidor que contiene su propia cadena de filtros de seguridad: la que configuramos con `SecurityFilterChain`.
+
 ### Dónde actúa Spring Security
 
 Spring Security **no** está en los controladores: está **antes**, en una cadena de **filtros** de servlet. La petición atraviesa los filtros y, solo si todos la dejan pasar, llega al `DispatcherServlet` y de ahí a nuestro controlador.
