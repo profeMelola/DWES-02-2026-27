@@ -225,7 +225,6 @@ $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
 
 ### 5.8 Cómo se comprueba el login: `matches`
 
-Duda típica: *si la sal es aleatoria cada vez, ¿cómo funciona el login?*
 
 ```java
 String hash = passwordEncoder.encode("1234");          // al guardar: sal nueva + batido
@@ -238,23 +237,7 @@ Lo que hace `matches("1234", hashGuardado)`:
 2. Bate `1234` con esa sal y ese coste.
 3. Compara el resultado con el batido guardado.
 
-Por eso:
 
-- `encode("1234")` da **un resultado distinto cada vez** (sal nueva).
-- `matches` **siempre funciona** (usa la sal guardada).
-- **Nunca** se compara con `equals`.
-
-> **Prueba en clase.** Ejecuta esto y compara los 22 caracteres después de `$2a$10$`: esa es la sal.
->
-> ```java
-> String h1 = passwordEncoder.encode("1234");
-> String h2 = passwordEncoder.encode("1234");
-> System.out.println(h1);
-> System.out.println(h2);                                   // distinto: otra sal
-> System.out.println(passwordEncoder.matches("1234", h1));  // true
-> System.out.println(passwordEncoder.matches("1234", h2));  // true
-> System.out.println(passwordEncoder.matches("4321", h1));  // false
-> ```
 
 ### 5.9 En nuestro proyecto
 
