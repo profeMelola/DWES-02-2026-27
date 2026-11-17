@@ -516,9 +516,8 @@ Tres detalles:
 
 - Los permisos son **authorities sin prefijo**. `ROLE_` solo identifica a los roles.
 - En el builder, `roles(...)` y `authorities(...)` **no se suman: la última llamada sustituye a la anterior**. Si un usuario necesita rol y permisos a la vez, todo va en `authorities(...)` y el rol se escribe con su prefijo: `.authorities("ROLE_ADMIN", "LIBRO_BORRAR")`.
-- En la BD, cada rol tiene varios permisos y cada permiso está en varios roles: una relación **N:M** (`rol`, `permiso`, `rol_permiso`). La veremos con JPA en la UT04.
+- En la BD, cada rol tiene varios permisos y cada permiso está en varios roles: una relación **N:M** (`rol`, `permiso`, `rol_permiso`).
 
-> En la API REST (UT03) también verás estos permisos en los métodos del servicio o del controlador con `@PreAuthorize("hasAuthority('LIBRO_BORRAR')")`, en vez de por URL.
 ---
 
 ## 9. CSRF
