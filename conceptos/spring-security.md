@@ -118,36 +118,101 @@ sequenceDiagram
 
 ## 5. Contraseñas: hash, sal y BCrypt
 
-### Regla de oro
+### 5.1 El problema: nos pueden robar la base de datos
 
-**Nunca se guarda la contraseña en la base de datos.** Ni en claro ni cifrada: se guarda su **hash**.
+Pasa más de lo que parece: un fallo de seguridad, una copia de seguridad perdida, un descuido. Si en la tabla `usuario` las contraseñas están tal cual, el atacante las tiene todas:
+
+| username | password |
+|---|---|
+| ana | `1234` |
+| luis | `maria1990` |
+
+Y como mucha gente repite contraseña, con ellas también entra en su correo, su banco…
+
+**Regla de oro: la contraseña nunca se guarda.** Ni en claro ni cifrada.
+
+¿Y cómo comprobamos entonces el login?
+
+### 5.2 El hash: una batidora
+
+Un **hash** funciona como una batidora:
+
+- Metes fruta → sale un batido. **Del batido no se puede volver a sacar la fruta.**
+- La misma fruta da **siempre el mismo batido**.
+
+```
+"1234"  ──hash──▶  03ac674216f3e15c761ee1a5e255f067...
+"1235"  ──hash──▶  b4b147bc522828731f1a016bfa72c073...   (un cambio mínimo, batido totalmente distinto)
+```
+
+Guardamos **el batido**, no la contraseña. En el login, se bate lo que escribe el usuario y se **comparan batidos**:
+
+```
+Escribe "1234"  ──hash──▶  03ac67...  ==  03ac67... (guardado)   →  ✅ contraseña correcta
+```
+
+Nunca se "descifra" nada.
 
 | | Cifrado | Hash |
 |---|---|---|
-| ¿Se puede volver atrás? | Sí, con la clave | No (función de un solo sentido) |
-| Si roban la BD (y la clave) | Tienen todas las contraseñas | Solo tienen hashes |
+| ¿Se puede volver atrás? | Sí, con la clave | **No** |
+| Si roban la BD (y la clave) | Tienen todas las contraseñas | Solo tienen batidos |
 | Para contraseñas | ❌ | ✅ |
 
-¿Cómo se comprueba entonces el login? **Se calcula el hash de lo que escribe el usuario y se compara con el guardado.** Nunca se "descifra" nada.
+### 5.3 Problema: las tablas precalculadas
 
-### Por qué no basta con un hash cualquiera (MD5, SHA-256)
+Como la misma contraseña da siempre el mismo batido, el atacante **bate de antemano millones de contraseñas típicas** y las guarda en una tabla (las hay ya hechas en internet):
 
-- Son **muy rápidos**: un atacante puede probar miles de millones de contraseñas por segundo.
-- Misma contraseña → mismo hash: si dos usuarios usan `1234`, se nota, y existen tablas precalculadas (*rainbow tables*).
+| Contraseña | Batido |
+|---|---|
+| `1234` | `03ac67...` |
+| `qwerty` | `65e84b...` |
+| `maria1990` | `9f1c2d...` |
 
-### La sal (*salt*)
+Después solo **busca** los batidos robados en su tabla. Instantáneo. Además, si `ana` y `luis` usan la misma contraseña, tienen el mismo batido y se nota.
 
-Antes de calcular el hash se añade a la contraseña un valor **aleatorio distinto para cada usuario**, la sal. Resultado: la misma contraseña produce hashes distintos y las tablas precalculadas no sirven.
+### 5.4 Solución: la sal
 
-### BCrypt
+Antes de batir se añade un **ingrediente aleatorio distinto para cada usuario: la sal**.
 
-Algoritmo de hash pensado para contraseñas:
+```
+"1234" + sal de Ana  (Xk9...)  ──hash──▶  7a1f...
+"1234" + sal de Luis (P2m...)  ──hash──▶  c03e...   (misma contraseña, batido distinto)
+```
 
-- **Genera la sal automáticamente** y la guarda dentro del propio hash.
-- Es **lento a propósito**, con un **factor de coste** configurable: cada +1 duplica el tiempo. Por defecto, 10.
-- `PasswordEncoder` de Spring: `BCryptPasswordEncoder`.
+Ahora **ya no existe "el" batido de `1234`**: cada usuario tiene el suyo. La tabla precalculada no sirve.
 
-Anatomía de un hash BCrypt (60 caracteres):
+**¿La sal es secreta?** No. Se guarda junto al hash y cualquiera puede leerla. Entonces, ¿de qué sirve?
+
+- El atacante **puede** coger la sal de Ana, batir `1234` con ella y comparar.
+- Pero luego tiene que **repetirlo con la sal de Luis**, y con la del siguiente…
+- **No puede reutilizar el trabajo**: tiene que atacar **usuario por usuario**.
+
+> La sal no protege una contraseña débil: si Ana usa `1234`, caerá enseguida. Lo que impide es atacar a todos a la vez.
+
+### 5.5 Problema: los hashes normales son demasiado rápidos
+
+Hashes como MD5 o SHA-256 son rapidísimos: un atacante prueba **miles de millones de contraseñas por segundo**. Aunque tenga que ir usuario por usuario, acaba enseguida.
+
+### 5.6 Solución: BCrypt, una batidora lenta a propósito
+
+**BCrypt** es un hash pensado para contraseñas:
+
+- Pone la **sal automáticamente**.
+- Es **lento a propósito**: unos 0,1 segundos por hash.
+- Su **coste** es ajustable: cada +1 duplica el tiempo. Por defecto, 10. Cuando los ordenadores sean más rápidos, se sube.
+
+0,1 segundos no los nota quien hace login. Pero mira lo que supone para un atacante que ha robado **1.000 usuarios** y prueba **1 millón de contraseñas típicas**:
+
+| | Hashes que calcula | Tiempo |
+|---|---|---|
+| Sin sal, hash rápido | 1 millón, una vez (o usa una tabla ya hecha) | Instantáneo |
+| Con sal, hash rápido | 1 millón × 1.000 usuarios = 1.000 millones | Minutos |
+| **Con sal + BCrypt** | 1.000 millones × 0,1 s | **Unos 3 años** |
+
+**La sal y la lentitud van juntas.** La sal obliga a trabajar usuario por usuario, y BCrypt hace que cada intento sea caro.
+
+### 5.7 Un hash BCrypt lo lleva todo dentro
 
 ```
 $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
@@ -156,21 +221,63 @@ $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
  └ versión del algoritmo
 ```
 
-Los dos métodos que importan de `PasswordEncoder`:
+60 caracteres que guardan **versión, coste, sal y batido**. Por eso la columna de la contraseña es `VARCHAR(60)`.
+
+### 5.8 Cómo se comprueba el login: `matches`
+
+Duda típica: *si la sal es aleatoria cada vez, ¿cómo funciona el login?*
 
 ```java
-String hash = passwordEncoder.encode("1234");          // para guardar
-boolean ok  = passwordEncoder.matches("1234", hash);   // para comprobar
+String hash = passwordEncoder.encode("1234");          // al guardar: sal nueva + batido
+boolean ok  = passwordEncoder.matches("1234", hash);   // al hacer login
 ```
 
-> **Prueba en clase:** llama dos veces a `encode("1234")`. Salen dos hashes distintos y **los dos** dan `true` con `matches`. Por eso **nunca** se compara con `equals`: cada hash lleva su propia sal.
+Lo que hace `matches("1234", hashGuardado)`:
 
-Consecuencias prácticas:
+1. Lee la sal **del propio hash guardado**.
+2. Bate `1234` con esa sal y ese coste.
+3. Compara el resultado con el batido guardado.
 
-- La columna de la contraseña necesita al menos `VARCHAR(60)`.
-- En los `INSERT` de `data.sql` se pone **el hash**, no la contraseña (lo generamos una vez con `encode` y lo copiamos).
+Por eso:
+
+- `encode("1234")` da **un resultado distinto cada vez** (sal nueva).
+- `matches` **siempre funciona** (usa la sal guardada).
+- **Nunca** se compara con `equals`.
+
+> **Prueba en clase.** Ejecuta esto y compara los 22 caracteres después de `$2a$10$`: esa es la sal.
+>
+> ```java
+> String h1 = passwordEncoder.encode("1234");
+> String h2 = passwordEncoder.encode("1234");
+> System.out.println(h1);
+> System.out.println(h2);                                   // distinto: otra sal
+> System.out.println(passwordEncoder.matches("1234", h1));  // true
+> System.out.println(passwordEncoder.matches("1234", h2));  // true
+> System.out.println(passwordEncoder.matches("4321", h1));  // false
+> ```
+
+### 5.9 En nuestro proyecto
+
+| Qué | Cómo |
+|---|---|
+| Algoritmo | Un bean `PasswordEncoder` que devuelve `new BCryptPasswordEncoder()`. Spring lo usa solo en el login. |
+| Columna `password` | `VARCHAR(60)` |
+| `data.sql` | Se inserta **el hash**, nunca `'1234'`. Se genera una vez con `encode` y se copia. |
+| Si en la BD hay una contraseña en claro | El login falla y la consola avisa: `Encoded password does not look like BCrypt`. |
 
 > En tutoriales verás contraseñas como `{noop}1234` o `{bcrypt}$2a$10$...`. Ese prefijo entre llaves lo usa `DelegatingPasswordEncoder`, que admite varios algoritmos a la vez. Nosotros declaramos directamente un `BCryptPasswordEncoder`, así que **no** se pone prefijo.
+
+### Resumen
+
+> No guardamos la contraseña: guardamos su **batido** (hash),
+> con una **sal** distinta para cada usuario (para que no sirvan las tablas precalculadas)
+> y con una batidora **lenta** a propósito (BCrypt, para que probar contraseñas cueste años).
+
+| Problema | Solución |
+|---|---|
+| Si roban la BD, tienen las contraseñas | **Hash**: se guarda el batido, sin vuelta atrás |
+| Tablas precalculadas; contraseñas iguales con el mismo hash | **Sal** aleatoria por usuario, guardada dentro del hash |
+| Se prueban miles de millones por segundo | **BCrypt**: lento a propósito, con coste ajustable |
 
 ---
 
