@@ -110,7 +110,7 @@ sequenceDiagram
 | **Fijación de sesión** | Al hacer login **cambia el identificador** de sesión. Si alguien consiguió que usaras un `JSESSIONID` conocido antes de entrar, deja de valerle. |
 | **Logout** | Invalida la sesión y borra el contexto de seguridad. |
 | **Caducidad** | Si no hay actividad, la sesión caduca (por defecto 30 minutos; propiedad `server.servlet.session.timeout`). |
-| **Robo de la cookie** | Quien tenga tu `JSESSIONID` **es tú** para el servidor. Por eso en producción va siempre por HTTPS. |
+| **Robo de la cookie** | Quien tenga tu `JSESSIONID` **es tú** para el servidor. Por eso en producción la aplicación va siempre por **HTTPS** (normalmente lo pone un servidor intermedio, como Nginx, y no Spring Boot) y la cookie se marca `Secure`, que solo viaja cifrada (`server.servlet.session.cookie.secure=true`), y `HttpOnly`, que JavaScript no puede leer (`server.servlet.session.cookie.http-only=true`, activado por defecto). En clase trabajamos en `localhost` por HTTP. |
 
 > **Sesión vs token:** en la UT03 la API REST no usará sesión, sino un token JWT que el cliente envía en cada petición. Misma idea (recordar quién eres), distinto mecanismo.
 
