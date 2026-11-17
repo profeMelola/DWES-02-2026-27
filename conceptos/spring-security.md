@@ -433,12 +433,6 @@ return User.builder()
 
 **Regla de clase:** nunca escribimos `ROLE_` a mano. Ni en la BD ni en el código: lo pone siempre Spring.
 
-### Errores al mezclar
-
-| Error | Qué pasa |
-|---|---|
-| Guardar `'ROLE_ADMIN'` en la BD y usar `.roles(...)` | **Excepción** al hacer login: `roles()` añade el prefijo y no admite que ya venga puesto. |
-| Usar `.authorities(...)` en vez de `.roles(...)` | El usuario tiene la authority `ADMIN`, sin prefijo. `hasRole("ADMIN")` busca `ROLE_ADMIN` → **403 para todos**. |
 
 ### Otras formas que verás (no las usamos)
 
