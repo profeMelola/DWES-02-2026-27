@@ -614,7 +614,9 @@ En el `pom.xml`:
 <maven.test.skip>true</maven.test.skip>
 ```
 
-2. Sustituye la dependencia comentada `spring-boot-starter-webmvc-test` por estas dos:
+2. Revisa las dependencias de test en el `pom.xml`:
+   - `spring-boot-starter-webmvc-test` (MockMvc) ya está, pero **comentada**: descoméntala.
+   - `spring-boot-starter-security-test` (`@WithMockUser`, `csrf()`, `formLogin()`): si en el paso 1 añadiste Spring Security como starter de IntelliJ, se habrá añadido sola. Si no está, añádela.
 
 ```xml
 <!-- Tests: MockMvc y @WithMockUser -->
