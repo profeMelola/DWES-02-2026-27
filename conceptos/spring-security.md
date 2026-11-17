@@ -200,7 +200,7 @@ Hashes como MD5 o SHA-256 son rapidísimos: un atacante prueba **miles de millon
 
 - Pone la **sal automáticamente**.
 - Es **lento a propósito**: unos 0,1 segundos por hash.
-- Su **coste** es ajustable: cada +1 duplica el tiempo. Por defecto, 10. Cuando los ordenadores sean más rápidos, se sube.
+- Su **coste** dice cuántas veces bate la contraseña: con coste 10 (el valor por defecto), 2¹⁰ = 1.024 veces. Cada punto más duplica las vueltas y, por tanto, el tiempo. Sirve para adaptarse al futuro: si los ordenadores van el doble de rápido, se sube un punto y el atacante vuelve a tardar lo mismo. Se indica al crearlo: `new BCryptPasswordEncoder(12)`.
 
 0,1 segundos no los nota quien hace login. Pero mira lo que supone para un atacante que ha robado **1.000 usuarios** y prueba **1 millón de contraseñas típicas**:
 
