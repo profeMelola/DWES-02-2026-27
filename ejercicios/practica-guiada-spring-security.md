@@ -291,7 +291,18 @@ return Autor.builder()
 
 El resto lo haces tú...
 
-> **Para pensar.** Con el builder, ¿qué pasa si te olvidas de poner `.titulo(...)`? ¿Compila? ¿Qué valor tiene el título? ¿Quién debe impedir que se guarde un libro sin título?
+> **Para pensar.** Con el builder, ¿qué pasa si en el mapper te olvidas de poner `.titulo(...)`? ¿Compila? ¿Qué valor tiene el título? `LibroDto` tiene `@NotBlank` en el título: ¿te salva? ¿Quién lo impide entonces?
+
+<details>
+<summary>Respuesta</summary>
+
+Compila sin problema y el título queda a `null` (el valor por defecto de un `String`). `@NotBlank` **no te salva**: valida lo que escribe el usuario en el formulario, y el formulario sí traía título. El error es del programador, en el mapper.
+
+Lo impide la base de datos, porque la columna es `NOT NULL`: el `INSERT` falla y el usuario ve una página de error en lugar de un mensaje en el formulario.
+
+Moraleja: el builder no obliga a rellenar nada. Hay que rellenar todos los atributos, y la base de datos es la última barrera, no la primera.
+
+</details>
 
 ### 3.1 El `PasswordEncoder`
 
