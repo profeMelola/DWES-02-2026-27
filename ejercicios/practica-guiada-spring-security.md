@@ -289,21 +289,7 @@ return Autor.builder()
         .build();
 ```
 
-El resto lo haces tú:
-
-| Dónde | Pista |
-|---|---|
-| `AutorMapper.toModelEntity` | Igual que el ejemplo. |
-| `LibroRepositoryJdbc.mapRow` | Hay **dos** objetos: primero el `Autor`, luego el `Libro`. |
-| `LibroMapper.toModelEntity` | El `null` del `id` y el `null` del nombre del autor **desaparecen**: lo que no se rellena, no se escribe. |
-
-#### Comprueba
-
-| Prueba | Resultado esperado |
-|---|---|
-| Listado, alta y edición de libros y autores | Todo funciona igual que antes. |
-| Vuelve a añadir `ejemplares` a `Libro` y recompila | **Cero errores**. Quítalo otra vez. |
-| Busca `new Libro(` y `new Autor(` | Ningún resultado. |
+El resto lo haces tú...
 
 > **Para pensar.** Con el builder, ¿qué pasa si te olvidas de poner `.titulo(...)`? ¿Compila? ¿Qué valor tiene el título? ¿Quién debe impedir que se guarde un libro sin título?
 
