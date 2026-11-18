@@ -24,7 +24,7 @@ La contraseña de los tres usuarios es `1234`.
 | [0](#paso-0-destripar-la-aplicación-sin-seguridad) | Destripar la aplicación sin seguridad | Por qué hace falta |
 | [1](#paso-1-añadir-solo-la-dependencia) | Añadir solo la dependencia | Comportamiento por defecto |
 | [2](#paso-2-securityfilterchain-y-login-propio) | `SecurityFilterChain` y login propio | Rutas públicas, login, logout, CSRF |
-| [3](#paso-3-nuestros-usuarios-y-nuestro-userdetailsservice) | Nuestros usuarios y nuestro `UserDetailsService` | BCrypt, modelo, repositorio y adaptador (SRP, ISP, DIP) |
+| [3](#paso-3-nuestros-usuarios-y-nuestro-userdetailsservice) | Nuestros usuarios y nuestro `UserDetailsService` | Patrón Builder, BCrypt, modelo, repositorio y adaptador (SRP, ISP, DIP) |
 | [4](#paso-4-autorización-admin-y-user) | Autorización ADMIN / USER | `hasRole`, orden de las reglas, 403 |
 | [5](#paso-5-vistas-secauthorize-y-página-403) | Vistas: `sec:authorize` y página 403 | Ocultar no es proteger |
 | [6](#paso-6-tests-con-mockmvc-y-withmockuser) | Tests con MockMvc y `@WithMockUser` | Comprobar la seguridad sin navegador |
@@ -257,6 +257,56 @@ UsuarioDetailsService (service)  ──usa──▶  UsuarioRepository (interfaz
 
 > **¿Y la base de datos?** De momento los usuarios están en una lista. En la UT04, con JPA, crearemos otra implementación de `UsuarioRepository` que lea de la BD. **Solo cambiará esa clase**: el servicio y la configuración de seguridad no se tocarán.
 
+### 3.0 Antes de nada: refactorizar a Builder
+
+Vamos a crear un modelo nuevo, `Usuario`. Antes, arreglamos cómo se crean los objetos en el resto del proyecto.
+
+> Teoría: [Builder: crear objetos con muchos atributos](https://github.com/profeMelola/DWES-02-2026-27/blob/main/conceptos/SOLID-y-patrones.md#builder-crear-objetos-con-muchos-atributos)
+
+#### Destripa el problema
+
+1. Añade **temporalmente** a `Libro` el atributo `private int ejemplares;` y recompila (`Ctrl + F9`). ¿Cuántos errores salen? ¿En qué clases?
+2. Quita `ejemplares`. Ahora, en `LibroMapper.toModelEntity`, **intercambia** `dto.getIsbn()` y `dto.getTitulo()` dentro del `new Libro(...)`. ¿Compila? Da de alta un libro y mira el listado.
+3. Deshaz el cambio antes de seguir.
+
+> **Para pensar.** ¿Cuál de los dos problemas es peor: el que no compila o el que sí compila?
+
+#### Refactoriza
+
+1. Añade `@Builder` a `Libro` y a `Autor`. **No quites** `@NoArgsConstructor` ni `@AllArgsConstructor` (en la teoría tienes por qué).
+2. Busca todos los `new Libro(` y `new Autor(` del proyecto (`Ctrl + Shift + F`) y cámbialos por el builder.
+
+Ejemplo resuelto, `AutorRepositoryJdbc.mapRow`:
+
+```java
+// Antes
+return new Autor(rs.getInt("id"), rs.getString("nombre"));
+
+// Después
+return Autor.builder()
+        .id(rs.getInt("id"))
+        .nombre(rs.getString("nombre"))
+        .build();
+```
+
+El resto lo haces tú:
+
+| Dónde | Pista |
+|---|---|
+| `AutorMapper.toModelEntity` | Igual que el ejemplo. |
+| `LibroRepositoryJdbc.mapRow` | Hay **dos** objetos: primero el `Autor`, luego el `Libro`. |
+| `LibroMapper.toModelEntity` | El `null` del `id` y el `null` del nombre del autor **desaparecen**: lo que no se rellena, no se escribe. |
+
+#### Comprueba
+
+| Prueba | Resultado esperado |
+|---|---|
+| Listado, alta y edición de libros y autores | Todo funciona igual que antes. |
+| Vuelve a añadir `ejemplares` a `Libro` y recompila | **Cero errores**. Quítalo otra vez. |
+| Busca `new Libro(` y `new Autor(` | Ningún resultado. |
+
+> **Para pensar.** Con el builder, ¿qué pasa si te olvidas de poner `.titulo(...)`? ¿Compila? ¿Qué valor tiene el título? ¿Quién debe impedir que se guarde un libro sin título?
+
 ### 3.1 El `PasswordEncoder`
 
 Añade a `SecurityConfig` este bean:
@@ -281,6 +331,7 @@ Spring lo usa en cada login para comparar la contraseña escrita con el hash gua
  * La traducción a UserDetails la hace UsuarioDetailsService (SRP).
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
@@ -322,10 +373,20 @@ public interface UsuarioRepository {
 @Repository
 public class UsuarioRepositoryMemoria implements UsuarioRepository {
 
+```java
     private final List<Usuario> usuarios = List.of(
-            new Usuario(1, "admin", "$2a$10$FE6Xa2yaXAVUf9v7DDQoF.bjxEGeJujmNH7o5T91IUG3qjc3z05Py", "ADMIN", true),
-            new Usuario(2, "ana",   "$2a$10$07vZe7nhH1Oehrm51orcpeer3uYX1JPi5lLBWb.HW.JMX.llYoIaK", "USER",  true),
-            new Usuario(3, "luis",  "$2a$10$EQIZl.C1bGRS.QitQ.2aPuM62n.iRSiiLBqTCIUwFC21c9U9FPdyK", "USER",  false)
+            Usuario.builder()
+                    .id(1).username("admin").rol("ADMIN").activo(true)
+                    .password("$2a$10$FE6Xa2yaXAVUf9v7DDQoF.bjxEGeJujmNH7o5T91IUG3qjc3z05Py")
+                    .build(),
+            Usuario.builder()
+                    .id(2).username("ana").rol("USER").activo(true)
+                    .password("$2a$10$07vZe7nhH1Oehrm51orcpeer3uYX1JPi5lLBWb.HW.JMX.llYoIaK")
+                    .build(),
+            Usuario.builder()
+                    .id(3).username("luis").rol("USER").activo(false)
+                    .password("$2a$10$EQIZl.C1bGRS.QitQ.2aPuM62n.iRSiiLBqTCIUwFC21c9U9FPdyK")
+                    .build()
     );
 
     @Override
@@ -385,6 +446,7 @@ public class UsuarioDetailsService implements UserDetailsService {
     }
 }
 ```
+> **¿Te suena `User.builder()`?** Es el mismo patrón que acabas de aplicar en el 3.0. Aquí no lo genera Lombok: Spring Security lo trae hecho en su clase `User`.
 
 Lo que hace Spring con esta clase en cada login:
 
@@ -748,8 +810,16 @@ src/main/java/es/daw/bibliotecajdbc/
 ├── config/
 │   ├── SecurityConfig.java                NUEVO  (pasos 2, 3, 4)
 │   └── WebConfig.java                     + vista /login
-├── model/Usuario.java                     NUEVO  (paso 3)
+├── mapper/
+│   ├── AutorMapper.java                   new → builder (paso 3.0)
+│   └── LibroMapper.java                   new → builder (paso 3.0)
+├── model/
+│   ├── Autor.java                         + @Builder (paso 3.0)
+│   ├── Libro.java                         + @Builder (paso 3.0)
+│   └── Usuario.java                       NUEVO  (paso 3)
 ├── repository/
+│   ├── AutorRepositoryJdbc.java           new → builder (paso 3.0)
+│   ├── LibroRepositoryJdbc.java           new → builder (paso 3.0)
 │   ├── UsuarioRepository.java             NUEVO  (paso 3)
 │   └── UsuarioRepositoryMemoria.java      NUEVO  (paso 3)
 └── service/UsuarioDetailsService.java     NUEVO  (paso 3)
@@ -763,7 +833,7 @@ src/test/java/es/daw/bibliotecajdbc/
 └── SeguridadTest.java                     NUEVO  (paso 6)
 ```
 
-Fíjate en lo que **no** hemos tocado: ningún controlador, servicio ni repositorio de libros o autores. La seguridad se añade **alrededor** de la aplicación, en los filtros, sin mezclarse con la lógica de negocio.
+Fíjate en lo que **no** hemos tocado por la seguridad: ningún controlador ni servicio de libros o autores. Los cambios en mappers y repositorios del paso 3.0 son una refactorización, no seguridad. La seguridad se añade **alrededor** de la aplicación, en los filtros, sin mezclarse con la lógica de negocio.
 
 ## Errores típicos
 
