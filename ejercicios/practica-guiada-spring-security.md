@@ -263,14 +263,6 @@ Vamos a crear un modelo nuevo, `Usuario`. Antes, arreglamos cómo se crean los o
 
 > Teoría: [Builder: crear objetos con muchos atributos](https://github.com/profeMelola/DWES-02-2026-27/blob/main/conceptos/SOLID-y-patrones.md#builder-crear-objetos-con-muchos-atributos)
 
-#### Destripa el problema
-
-1. Añade **temporalmente** a `Libro` el atributo `private int ejemplares;` y recompila (`Ctrl + F9`). ¿Cuántos errores salen? ¿En qué clases?
-2. Quita `ejemplares`. Ahora, en `LibroMapper.toModelEntity`, **intercambia** `dto.getIsbn()` y `dto.getTitulo()` dentro del `new Libro(...)`. ¿Compila? Da de alta un libro y mira el listado.
-3. Deshaz el cambio antes de seguir.
-
-> **Para pensar.** ¿Cuál de los dos problemas es peor: el que no compila o el que sí compila?
-
 #### Refactoriza
 
 1. Añade `@Builder` a `Libro` y a `Autor`. **No quites** `@NoArgsConstructor` ni `@AllArgsConstructor` (en la teoría tienes por qué).
