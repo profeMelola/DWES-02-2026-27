@@ -356,7 +356,7 @@ public interface UsuarioRepository {
 }
 ```
 
-> **SOLID: principio de segregación de interfaces (ISP).** `LibroRepository` y `AutorRepository` extienden `GenericRepository` porque necesitan el CRUD completo. `UsuarioRepository` solo necesita buscar por nombre. Obligarle a implementar `save`, `update` y `delete` sería añadir métodos que nadie usa.
+> **[SOLID: principio de segregación de interfaces (ISP)]https://github.com/profeMelola/DWES-02-2026-27/blob/main/conceptos/SOLID-y-patrones.md#i--interface-segregation-interfaces-peque%C3%B1as).** `LibroRepository` y `AutorRepository` extienden `GenericRepository` porque necesitan el CRUD completo. `UsuarioRepository` solo necesita buscar por nombre. Obligarle a implementar `save`, `update` y `delete` sería añadir métodos que nadie usa.
 
 ### 3.4 El repositorio: implementación en memoria
 
