@@ -373,7 +373,17 @@ public class ProductoRepositoryListaMemoria implements ProductoRepository {
 
 ---
 
-## 4. Patrones que usarás en la UT02
+## 4. Patrones a usar
+
+> **¿Qué es la Gang of Four (GoF)?** Así se conoce a los cuatro autores (Gamma, Helm, Johnson y Vlissides) del libro *Design Patterns* (1994), que recogió **23 patrones** que siguen siendo la referencia. Los agrupan en tres tipos:
+>
+> | Tipo | Para qué sirven | Ejemplos que ya conoces |
+> |---|---|---|
+> | **Creacionales** | Cómo se crean los objetos | Singleton, Builder |
+> | **Estructurales** | Cómo se combinan las clases | Decorator (`new BufferedReader(new FileReader(...))`) |
+> | **De comportamiento** | Cómo se comunican los objetos | Iterator (el `for` que recorre una `List`) |
+>
+> De la tabla de abajo, solo **Singleton** y **Builder** son de la GoF. MVC, Repository, Service y DTO son patrones de arquitectura que aparecieron por otras vías, pero se usan igual.
 
 | Patrón | Problema que resuelve | En tu proyecto |
 |---|---|---|
@@ -383,6 +393,7 @@ public class ProductoRepositoryListaMemoria implements ProductoRepository {
 | **Service** | Reglas de negocio en un solo sitio | `ProductoService` |
 | **DTO / Form** | Mover datos a la vista sin exponer el modelo | `ProductoForm` |
 | **Singleton** | Una sola instancia | Los beans de Spring lo son por defecto |
+| **Builder** | Crear objetos con muchos atributos de forma legible | `Producto.builder()...build()` (Lombok `@Builder`) |
 
 ### DTO / Form: datos del formulario
 
@@ -465,6 +476,115 @@ new ContadorVisitas();                // ❌ no compila: el constructor es priva
 Las tres piezas: **atributo `static`**, **constructor `private`** y **método `static` `getInstance()`**.
 
 > **En Spring no lo escribes tú:** cada `@Service`, `@Repository` o `@Component` ya es un singleton. Spring crea la única instancia y te la inyecta.
+
+### Builder: crear objetos con muchos atributos
+
+**Problema:** un constructor con muchos parámetros no hay quien lo lea.
+
+```java
+Producto p = new Producto(1, "Teclado", 29.99, 10);   // ¿10 qué? ¿unidades? ¿descuento?
+```
+
+Si te equivocas de orden y dos parámetros son del mismo tipo, **compila igual** y el error no aparece hasta que ves los datos mal.
+
+**Solución:** construir el objeto **paso a paso, nombrando cada atributo**.
+
+```java
+Producto p = Producto.builder()
+        .id(1)
+        .nombre("Teclado")
+        .precio(29.99)
+        .stock(10)
+        .build();
+```
+
+Se lee solo, el orden da igual y puedes omitir los atributos que no necesites.
+
+#### Sin Lombok: así funciona por dentro
+
+```java
+public class Producto {
+
+    private final Integer id;
+    private final String nombre;
+    private final double precio;
+    private final int stock;
+
+    private Producto(Builder b) {                    // 1) constructor privado: solo lo usa el Builder
+        this.id = b.id;
+        this.nombre = b.nombre;
+        this.precio = b.precio;
+        this.stock = b.stock;
+    }
+
+    public static Builder builder() {                // 2) punto de entrada
+        return new Builder();
+    }
+
+    public static class Builder {                    // 3) clase interna que va guardando los valores
+        private Integer id;
+        private String nombre;
+        private double precio;
+        private int stock;
+
+        public Builder id(Integer id)         { this.id = id;         return this; }   // 4) devuelve this
+        public Builder nombre(String nombre)  { this.nombre = nombre; return this; }   //    para encadenar
+        public Builder precio(double precio)  { this.precio = precio; return this; }
+        public Builder stock(int stock)       { this.stock = stock;   return this; }
+
+        public Producto build() {                    // 5) crea el objeto final
+            return new Producto(this);
+        }
+    }
+}
+```
+
+La clave está en el `return this`: cada método devuelve el mismo Builder, y por eso se pueden **encadenar** las llamadas.
+
+#### Con Lombok: una anotación
+
+```java
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Producto {
+    private Integer id;
+    private String nombre;
+    private double precio;
+    private int stock;
+}
+```
+
+`@Builder` genera **todo** el código del apartado anterior.
+
+> **¿Por qué `@NoArgsConstructor` y `@AllArgsConstructor`?** `@Builder` necesita un constructor con todos los atributos, y al generarlo **desaparece el constructor vacío**. Spring lo necesita para rellenar formularios (y JPA lo necesitará en las entidades). Con estas dos anotaciones tienes los dos.
+
+> **Valores por defecto:** si escribes `private int stock = 5;`, el builder **lo ignora** y deja `0`. Para que lo respete: `@Builder.Default private int stock = 5;`
+
+#### Dónde lo usarás: convertir el formulario en modelo
+
+```java
+@Service
+public class ProductoService {
+
+    public void crear(ProductoForm form) {
+        Producto producto = Producto.builder()
+                .nombre(form.getNombre())
+                .precio(form.getPrecio())
+                .build();                            // sin id: lo pone la base de datos
+        repository.save(producto);
+    }
+}
+```
+
+| | Constructor | Builder |
+|---|---|---|
+| Legibilidad | `new Producto(1, "Teclado", 29.99, 10)` | Cada valor con su nombre |
+| Orden de los parámetros | Obligatorio | Da igual |
+| Atributos opcionales | Un constructor por combinación | Los omites y listo |
+| Código que escribes | Poco | Mucho a mano, nada con Lombok |
+
 ---
 
 ## 5. Chuleta de IntelliJ (Windows y Linux)
