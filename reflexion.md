@@ -13,7 +13,6 @@ Las empresas ya no buscan a alguien que escriba un CRUD de memoria; eso lo hace 
 
 - **Los frameworks cambian; los fundamentos se quedan.** Spring, Thymeleaf o JPA cambiarán de versión o se sustituirán por otros. Saber leer código, depurar y detectar un fallo de seguridad o de rendimiento sirve con cualquier tecnología.
 - **Conocer muchas herramientas por encima no basta.** Quien conoce diez frameworks pero no sabe verificar lo que hace ninguno es justo el perfil que la IA ya puede sustituir.
-- **Profundidad en lo importante, panorama en lo demás.** En clase trabajamos a fondo con tecnologías actuales y veremos otras como cultura general, para que sepas reconocerlas cuando te las encuentres.
 
 ## La realidad del mercado: proyectos legacy
 
