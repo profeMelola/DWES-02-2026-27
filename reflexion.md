@@ -51,10 +51,12 @@ Es lo que se hace en una empresa: revisar código ajeno o generado, decidir qué
 
 ## Conclusión
 
-El criterio para usar la IA de forma eficiente solo se adquiere programando sin ella.
+- El criterio para usar la IA de forma eficiente solo se adquiere programando sin ella.
 
-Ocurre lo mismo que con la calculadora. Su llegada no hizo que dejáramos de aprender a sumar. Quien no sabe sumar acepta cualquier número que aparezca en la pantalla.
+- El modelo tradicional de aprendizaje, en el que el junior gana experiencia peleándose con problemas reales bajo la tutela de un senior, se está rompiendo. El junior que no ha pasado por esa “lucha productiva” no podrá revisar ni corregir lo que genera la IA. Por eso los fundamentos importan más que antes, no menos.
 
-Con la IA la diferencia es todavía mayor. La calculadora no se equivoca si se usa bien; la IA sí, y además sus errores parecen correctos: código que compila y funciona en el caso fácil, pero que es inseguro, ineficiente o rompe la arquitectura. Para detectarlos hay que saber programar. Dejar de aprender a programar porque existe la IA nos dejaría sin la capacidad de decidir qué le pedimos y de comprobar si lo que nos devuelve está bien.
+- Ocurre lo mismo que con la calculadora. Su llegada no hizo que dejáramos de aprender a sumar. Quien no sabe sumar acepta cualquier número que aparezca en la pantalla.
+  - Con la IA la diferencia es todavía mayor. La calculadora no se equivoca si se usa bien; la IA sí, y además sus errores parecen correctos: código que compila y funciona en el caso fácil, pero que es inseguro, ineficiente o rompe la arquitectura. Para detectarlos hay que saber programar.
+- Dejar de aprender a programar porque existe la IA nos dejaría sin la capacidad de decidir qué le pedimos y de comprobar si lo que nos devuelve está bien.
 
 > **Cuidado con el "síndrome del impostor".** Hay estudiantes brillantes que sienten que usar IA es "hacer trampas" incluso cuando ya tienen una buena base. Una vez superada la fase sin IA, no usarla en el día a día te hace menos competitivo. ¡Úsala!
