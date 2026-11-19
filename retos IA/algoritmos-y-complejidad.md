@@ -102,6 +102,52 @@ Libro encontrado = librosPorIsbn.get("978-84-376-0494-7");   // directo
 - ✅ Acceso directo por clave, da igual cuántos libros haya.
 - ❌ Ocupa más memoria y solo sirve para buscar **por la clave exacta** (no para "libros entre 1990 y 2000").
 
+#### ¿Cómo sabe el `HashMap` dónde está el libro?
+
+Imagina una biblioteca con **10 estanterías**, numeradas del 0 al 9. La regla es:
+
+> El libro va a la estantería que indica el **último dígito de su ISBN**.
+
+- ¿Buscas el ISBN `978-84-376-0494-7`? → Vas directo a la **estantería 7**. No miras las otras 9.
+- En la estantería 7 puede haber varios libros (todos los que terminan en 7). Ahí sí miras cuál es el tuyo.
+
+Java hace exactamente esto con dos métodos:
+
+| Método | Qué hace | En la biblioteca |
+|---|---|---|
+| `hashCode()` | Calcula un número que indica **en qué estantería** mirar | El último dígito del ISBN |
+| `equals()` | Comprueba si **este** es el libro que buscas | Leer el ISBN completo |
+
+Por eso tu clase `Libro` necesita los dos, y los dos tienen que usar **el mismo criterio** (el ISBN):
+
+```java
+@Override
+public boolean equals(Object o) {
+    if (!(o instanceof Libro otro)) return false;
+    return isbn.equals(otro.isbn);
+}
+
+@Override
+public int hashCode() {
+    return isbn.hashCode();
+}
+```
+
+Con Lombok: `@EqualsAndHashCode(of = "isbn")`.
+
+**¿Qué pasa si no los pones?** Java compara si son *el mismo objeto en memoria*, no si tienen el mismo ISBN:
+
+```java
+Libro a = new Libro("978-84-376-0494-7", "Cien años de soledad");
+Libro b = new Libro("978-84-376-0494-7", "Cien años de soledad");
+
+Set<Libro> libros = new HashSet<>();
+libros.add(a);
+
+libros.contains(b);   // false ❌ (sin equals/hashCode)
+                      // true  ✅ (con equals/hashCode por ISBN)
+```
+
 ---
 
 ## 4. El error más típico: el O(n²) escondido
