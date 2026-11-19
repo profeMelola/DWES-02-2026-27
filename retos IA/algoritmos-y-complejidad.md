@@ -36,15 +36,22 @@ Y el índice tampoco es gratis: ocupa espacio y hace más lentos los `INSERT` y 
 Big O responde a una pregunta: **si los datos se multiplican por 10, ¿cuánto más tarda mi código?**
 
 Piensa en una biblioteca física:
+| Big O | Cómo se lee | Nombre | En la biblioteca | En código |
+|---|---|---|---|---|
+| **O(1)** | "O de uno" (tarda lo mismo con 10 datos que con un millón) | Constante | Sabes la estantería y el hueco exactos: vas directo | `array[5]`, `map.get(isbn)` |
+| **O(log n)** | "O de logaritmo de n" (cada paso descarta la mitad de los datos) | Logarítmica | Libros ordenados: abres por la mitad, descartas media biblioteca, repites | Búsqueda binaria |
+| **O(n)** | "O de n" (si duplicas los datos, duplicas el tiempo) | Lineal | Miras los libros uno a uno hasta encontrarlo | Un `for` que recorre la lista |
+| **O(n log n)** | "O de n por logaritmo de n" (un poco peor que lineal; es lo que cuesta ordenar bien) | Linearítmica | Ordenar toda la biblioteca de forma inteligente | `list.sort(...)` |
+| **O(n²)** | "O de n al cuadrado" (si duplicas los datos, el tiempo se multiplica por 4) | Cuadrática | Para cada libro, lo comparas con **todos** los demás | Dos `for` anidados sobre la misma lista |
+| **O(2ⁿ)** | "O de dos elevado a n" (cada dato más duplica el tiempo) | Exponencial | Probar todas las combinaciones posibles de libros | Fuerza bruta con combinaciones |
 
-| Big O | Nombre | En la biblioteca | En código |
-|---|---|---|---|
-| **O(1)** | Constante | Sabes la estantería y el hueco exactos: vas directo | `array[5]`, `map.get(isbn)` |
-| **O(log n)** | Logarítmica | Libros ordenados: abres por la mitad, descartas media biblioteca, repites | Búsqueda binaria |
-| **O(n)** | Lineal | Miras los libros uno a uno hasta encontrarlo | Un `for` que recorre la lista |
-| **O(n log n)** | Linearítmica | Ordenar toda la biblioteca de forma inteligente | `list.sort(...)` |
-| **O(n²)** | Cuadrática | Para cada libro, lo comparas con **todos** los demás | Dos `for` anidados sobre la misma lista |
-| **O(2ⁿ)** | Exponencial | Probar todas las combinaciones posibles de libros | Fuerza bruta con combinaciones |
+> 💡 **¿Qué es el logaritmo aquí?** Responde a esta pregunta: *¿cuántas veces puedo partir n por la mitad hasta quedarme con 1?*
+>
+> - 8 → 4 → 2 → 1: **3 veces**, así que log 8 = 3.
+> - 1.000.000 → … → 1: **unas 20 veces**, así que log 1.000.000 ≈ 20.
+>
+> Por eso buscar en un millón de datos ordenados cuesta unos 20 pasos, y no un millón.
+
 
 ### Cuántos pasos supone cada una
 
