@@ -45,12 +45,6 @@ Piensa en una biblioteca física:
 | **O(n²)** | "O de n al cuadrado" (si duplicas los datos, el tiempo se multiplica por 4) | Cuadrática | Para cada libro, lo comparas con **todos** los demás | Dos `for` anidados sobre la misma lista |
 | **O(2ⁿ)** | "O de dos elevado a n" (cada dato más duplica el tiempo) | Exponencial | Probar todas las combinaciones posibles de libros | Fuerza bruta con combinaciones |
 
-> 💡 **¿Qué es el logaritmo aquí?** Responde a esta pregunta: *¿cuántas veces puedo partir n por la mitad hasta quedarme con 1?*
->
-> - 8 → 4 → 2 → 1: **3 veces**, así que log 8 = 3.
-> - 1.000.000 → … → 1: **unas 20 veces**, así que log 1.000.000 ≈ 20.
->
-> Por eso buscar en un millón de datos ordenados cuesta unos 20 pasos, y no un millón.
 
 
 ### Cuántos pasos supone cada una
