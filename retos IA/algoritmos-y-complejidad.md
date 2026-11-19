@@ -125,16 +125,30 @@ Por eso tu clase `Libro` necesita los dos, y los dos tienen que usar **el mismo 
 @Override
 public boolean equals(Object o) {
     if (!(o instanceof Libro otro)) return false;
-    return isbn.equals(otro.isbn);
+    return Objects.equals(isbn, otro.isbn);   // no falla si isbn es null
 }
 
 @Override
 public int hashCode() {
-    return isbn.hashCode();
+    return Objects.hashCode(isbn);
 }
 ```
 
-Con Lombok: `@EqualsAndHashCode(of = "isbn")`. Cuidado con `@Data`: genera esos métodos con todos los campos, y entonces dos libros con el mismo ISBN y distinto número de ejemplares contarían como distintos.
+Con Lombok, marca solo el campo que define la igualdad:
+
+```java
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class Libro {
+    @EqualsAndHashCode.Include
+    private String isbn;
+    private String titulo;
+    private int ejemplares;
+}
+```
+
+Cuidado con `@Data`: genera esos métodos con todos los campos, y entonces dos libros con el mismo ISBN y distinto número de ejemplares contarían como distintos.
+
+> 🔜 **Cuando trabajemos con JPA:** no uses `@Data` en las entidades. Además de este problema, sus `equals()`, `hashCode()` y `toString()` recorren las relaciones entre entidades, y eso puede lanzar consultas inesperadas o bucles infinitos. Compara por un campo que identifique al objeto, como el ISBN.
 
 **¿Qué pasa si no los pones?** Java compara si son *el mismo objeto en memoria*, no si tienen el mismo ISBN:
 
@@ -193,6 +207,8 @@ for (Libro libro : listaA) {               // n veces
 
 El penúltimo es el más peligroso en nuestras aplicaciones: **una consulta SQL dentro de un bucle**. Con 10 autores no lo notas. Con 10.000, la página tarda minutos.
 
+> 🔜 **Cuando trabajemos con JPA:** este problema reaparece aunque no escribas la consulta. Si las relaciones son *lazy* (carga perezosa), al recorrer los autores y acceder a `autor.getLibros()`, JPA lanza una consulta por cada autor. Es el **problema N+1**: 1 consulta para los autores + N consultas para sus libros. Se resuelve cargando los datos relacionados en una sola consulta, por ejemplo con `JOIN FETCH`.
+
 ---
 
 ## 5. Ordenación: no la programes, entiéndela
@@ -245,7 +261,7 @@ Fíjate: el buen prompt **contiene las respuestas a las preguntas del apartado 1
 2. **¿Hay accesos a BD dentro de un bucle?**
 3. **¿Asume datos ordenados?** Si usa búsqueda binaria, ¿quién garantiza el orden?
 4. **¿Usa `HashMap`/`HashSet` con una clase propia?** ¿Tiene `equals()` y `hashCode()`?
-5. **¿Sigue los patrones de clase?** Una solución "más eficiente" que se salta las capas no es mejor solución.
+5. **¿Sigue los patrones que usamos en clase** (controlador, servicio y repositorio)? Una solución "más eficiente" que se salta las capas no es mejor solución.
 6. **¿Puedes explicar por qué funciona?** Si no, no lo entregues: pregúntale a la IA hasta entenderlo, o escríbelo tú.
 
 ### 7.3 Pídele que se justifique… y compruébalo

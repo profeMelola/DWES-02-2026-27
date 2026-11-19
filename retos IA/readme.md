@@ -2,5 +2,8 @@
 
 <img src="./image.png" height="200"/>
 
+<sub>Fuente:https://www.cambio16.com/uso-excesivo-de-ia-podria-disminuir-el-pensamiento-critico/</sub>
+
+
 - [Requisitos vagos](./requisitos-vagos.md)
 - [Algoritmos y complejidad](./algoritmos-y-complejidad.md)
