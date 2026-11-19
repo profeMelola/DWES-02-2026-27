@@ -133,7 +133,7 @@ public int hashCode() {
 }
 ```
 
-Con Lombok: `@EqualsAndHashCode(of = "isbn")`.
+Con Lombok: `@EqualsAndHashCode(of = "isbn")`. Cuidado con `@Data`: genera esos métodos con todos los campos, y entonces dos libros con el mismo ISBN y distinto número de ejemplares contarían como distintos.
 
 **¿Qué pasa si no los pones?** Java compara si son *el mismo objeto en memoria*, no si tienen el mismo ISBN:
 
