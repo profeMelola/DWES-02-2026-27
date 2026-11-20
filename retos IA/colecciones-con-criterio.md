@@ -119,6 +119,29 @@ lineas.merge(productoId, cantidad, Integer::sum);    // si no está, lo añade; 
 lineas.remove(productoId);                           // quitar un producto
 ```
 
+**¿Por qué el `Map` si un carrito tiene pocos productos?** No es por velocidad: con 5 o 10 productos, recorrer la lista o ir directo por la clave tarda lo mismo. Se recomienda el `Map` porque **evita código innecesario**. Con la `List` necesitas un bucle, un `if` y un `return` para algo que el `Map` hace en una línea, y cada línea de más es un sitio donde puede colarse un fallo. Además, el `Map` garantiza que cada producto aparece una sola vez: con la `List`, un error en el bucle puede añadir el mismo producto dos veces.
+
+**Un fallo que puede esconder el bucle de la `List`:**
+
+```java
+if (linea.getProductoId() == productoId)   // ❌ los dos son Long
+```
+
+Con `Long` (con mayúscula), `==` no compara el número, sino si son el mismo objeto:
+
+```java
+Long a = 100L;
+Long b = 100L;
+a == b;        // true  → funciona… por casualidad
+
+Long c = 200L;
+Long d = 200L;
+c == d;        // false ❌ mismo número, pero objetos distintos
+c.equals(d);   // true  ✅
+```
+
+Java reutiliza los objetos `Long` pequeños (del -128 al 127), por eso con ids bajos parece que funciona. En clase, con pocos datos de prueba, todo va bien; con el producto 200, no encuentra la línea y lo añade otra vez. **Los `Long` se comparan con `equals()`**, como los `String`. Con el `Map` este fallo no puede pasar.
+
 ### 3.2 Conjuntos (Sets)
 
 Colecciones de elementos **sin duplicados**. Comprobar si un elemento está es O(1).
