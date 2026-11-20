@@ -144,7 +144,9 @@ Set<String> aQuitar = new HashSet<>(actuales);
 aQuitar.removeAll(nuevos);     // [EDITOR]
 ```
 
-**¿Y el orden?** Un `HashSet` no guarda ningún orden. Si lo necesitas, `LinkedHashSet` mantiene el orden en que se añadieron los elementos. Pero si el orden importa, normalmente lo que quieres es una `List`.
+**¿Y el orden?** Un `HashSet` no garantiza ningún orden: si muestras los roles en una vista, pueden salir en cualquier orden. Si necesitas que no haya repetidos y que se mantenga el orden en que se añadieron, usa `LinkedHashSet`.
+
+En vuestras aplicaciones el orden de los roles casi nunca importa.
 
 ---
 
