@@ -320,6 +320,10 @@ El buen prompt ya dice **dónde** se hace cada cosa: en la BD o en memoria.
 
 </details>
 
+
+---
+
+## 9. [API Stream](https://github.com/profeMelola/DWES-01-2026-27/blob/main/conceptos/api-stream.md)
 ---
 
 ## Resumen en tres frases
