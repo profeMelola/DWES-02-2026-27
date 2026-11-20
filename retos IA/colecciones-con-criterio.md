@@ -323,11 +323,14 @@ El buen prompt ya dice **dónde** se hace cada cosa: en la BD o en memoria.
 
 ---
 
-## 9. [API Stream](https://github.com/profeMelola/DWES-01-2026-27/blob/main/conceptos/api-stream.md)
----
 
 ## Resumen en tres frases
 
 1. **Buscar, filtrar, ordenar y contar se hace en la base de datos**, no trayendo la tabla a memoria.
 2. **`List` para resultados, `Map` para buscar por clave, `Set` para elementos únicos**, y `equals()`/`hashCode()` siempre por la clave de negocio.
 3. **La IA da código que funciona; tú decides si sirve.** Para eso te basta con hacerte las preguntas de la checklist.
+
+---
+
+## [API Stream](https://github.com/profeMelola/DWES-01-2026-27/blob/main/conceptos/api-stream.md)
+---
