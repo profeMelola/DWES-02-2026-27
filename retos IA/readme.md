@@ -7,3 +7,5 @@
 
 - [Requisitos vagos](./requisitos-vagos.md)
 - [Algoritmos y complejidad](./algoritmos-y-complejidad.md)
+- [Colecciones con criterio](./colecciones-con-criterio.md)
+  
