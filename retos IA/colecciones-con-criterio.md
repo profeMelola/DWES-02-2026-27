@@ -82,6 +82,7 @@ Si un método se llama a sí mismo sin parar, la pila se llena y salta `StackOve
 **En Java:** `Queue<Email> cola = new ArrayDeque<>();`.
 
 > ¿Y "los pedidos urgentes primero"? Eso no es una cola: es `ORDER BY urgente DESC, fecha`.
+> En la lógica de negocio de una aplicación web casi no las usarás.
 
 ---
 
