@@ -389,7 +389,7 @@ Spring Boot usa `templates/error.html` para los errores no controlados y le pasa
 
 
 ---
-## `${param}` en Thymeleaf
+## 13. `${param}` en Thymeleaf
 
 `param` es un **objeto implícito** de Thymeleaf que da acceso a los **parámetros de la petición HTTP**.
 
