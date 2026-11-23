@@ -584,7 +584,42 @@ public class ProductoService {
 | Orden de los parámetros | Obligatorio | Da igual |
 | Atributos opcionales | Un constructor por combinación | Los omites y listo |
 | Código que escribes | Poco | Mucho a mano, nada con Lombok |
+| Olvidar un atributo | **No compila**: el compilador te avisa | **Compila**: nadie te avisa (queda `null` o `0`) |
 
+#### ¿Entonces cuándo lo uso?
+
+Que sea un patrón **creacional** significa que trata de **cómo se crean los objetos**, no que haya que usarlo para crearlos todos. Un patrón resuelve un problema concreto: **si no tienes el problema, no lo apliques**.
+
+Para decidir, pregúntate **quién crea el objeto**:
+
+- **Lo creas tú** en tu código (mapper, `mapRow`, servicio, tests) y tiene **muchos atributos** → **Builder**.
+- **Lo crea Spring** (al enviar un formulario, o un componente) → Spring usa el **constructor vacío + setters**. El builder no le sirve de nada.
+
+| Clase | ¿Quién la crea? | ¿Builder? |
+|---|---|---|
+| Modelo (`Producto`, `Libro`) | **Tú**: mapper, `mapRow`, tests | ✅ Sí |
+| DTO de formulario (`ProductoForm`, `LibroDto`) | **Spring** al enviar el formulario (POST)<br>**Tú** en `mapper.toDto` para rellenar el formulario de edición | ✅ Sí, para el `toDto`, **sin quitar** `@NoArgsConstructor` (lo usa Spring) |
+| Clase con 2 o 3 atributos de tipos distintos (`Autor`) | Tú | Opcional: `new Autor(1, "Cortázar")` ya se lee bien. Si el resto del proyecto usa builder, úsalo también por coherencia |
+| Componentes (`@Service`, `@Repository`...) | **Spring** | ❌ Nunca |
+
+> **Por eso el DTO lleva las tres anotaciones:** `@Builder` y `@AllArgsConstructor` para cuando lo creas tú; `@NoArgsConstructor` para cuando lo crea Spring.
+
+```java
+// Lo creas tú: builder
+public LibroDto toDto(Libro libro) {
+    return LibroDto.builder()
+            .isbn(libro.getIsbn())
+            .titulo(libro.getTitulo())
+            .edicion(true)
+            .build();
+}
+
+// Lo crea Spring: constructor vacío + setters (no escribes nada)
+@PostMapping("/guardar")
+public String guardar(@Valid @ModelAttribute LibroDto libroDto, BindingResult errores) { ... }
+```
+
+> ⚠️ **Builder evita los errores de orden, no los olvidos.** Si añades un atributo nuevo (por ejemplo, `ejemplares`), todo sigue compilando: busca con `Alt + F7` los usos de `Libro.builder()` y añádelo donde haga falta.
 ---
 
 ## 5. Chuleta de IntelliJ (Windows y Linux)
