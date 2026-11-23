@@ -68,26 +68,7 @@ Por eso **no se indexa todo**: solo lo que se consulta mucho. La pregunta es la 
 
 ---
 
-## 2. `EXPLAIN`: pregúntale a la BD qué va a hacer
-
-Pon `EXPLAIN` delante de la consulta y la BD te dice **cómo** la va a ejecutar, sin ejecutarla:
-
-```sql
-EXPLAIN SELECT * FROM libro WHERE autor_id = 3;
-```
-
-| Si ves… | Significa |
-|---|---|
-| `tableScan` (H2), `ALL` (MySQL), `Seq Scan` (PostgreSQL) | ❌ Lee la tabla entera |
-| El nombre de un índice | ✅ Usa el índice |
-
-Pruébalo en la consola de H2: lanza el `EXPLAIN`, crea el índice y vuelve a lanzarlo.
-
-> 🤖 Puedes pegar la salida de `EXPLAIN` a la IA para que te la explique. Pero la decisión se toma con lo que dice `EXPLAIN`, no con lo que la IA supone.
-
----
-
-## 3. Tipos de datos y restricciones
+## 2. Tipos de datos y restricciones
 
 | Mal | Bien | Por qué |
 |---|---|---|
@@ -100,7 +81,7 @@ Pruébalo en la consola de H2: lanza el `EXPLAIN`, crea el índice y vuelve a la
 
 ---
 
-## 4. Conexiones: el pool
+## 3. Conexiones: el pool
 
 Abrir una conexión con la base de datos es **lento**. Por eso no se abre una por cada consulta: se tiene un **pool**, un grupo de conexiones abiertas que se prestan y se devuelven.
 
@@ -117,7 +98,7 @@ try (Connection con = dataSource.getConnection();
 
 ---
 
-## 5. Lo que haces tú desde el código
+## 4. Lo que haces tú desde el código
 
 | ❌ Evita | ✅ Mejor | Por qué |
 |---|---|---|
@@ -128,7 +109,7 @@ try (Connection con = dataSource.getConnection();
 
 ---
 
-## 6. Lo que hace un administrador en producción
+## 5. Lo que hace un administrador en producción
 
 | Tarea | Para qué |
 |---|---|
@@ -140,56 +121,39 @@ try (Connection con = dataSource.getConnection();
 
 ---
 
-## 7. Usar la IA con criterio
+## 6. Usar la IA con criterio
 
-La IA puede proponerte mejoras para la base de datos, pero **no conoce tus datos**: no sabe cuántas filas hay, qué consultas se repiten ni qué motor usas en producción. Antes de aplicar una mejora, necesitas criterio para decidir si tiene sentido.
+La IA puede proponerte mejoras para la base de datos, pero **no conoce tus datos**: no sabe cuántas filas hay ni qué consultas se repiten. Eso lo sabes tú.
 
-### 7.1 Antes de aplicar una mejora que te propone la IA
+### 6.1 Antes de aceptar una mejora, pregúntate
 
 | Pregunta | Por qué |
 |---|---|
-| **¿He medido que hay un problema?** | Sin `EXPLAIN` o sin el registro de consultas lentas, estás optimizando a ciegas |
 | **¿Cuántas filas tendrá la tabla?** | Con 100 filas, ninguna mejora se notará |
 | **¿Se lee mucho o se escribe mucho?** | Un índice acelera las lecturas y ralentiza las escrituras |
-| **¿Qué motor uso en producción?** | Lo que vale en MySQL puede no valer en H2 o PostgreSQL, y al revés |
-| **¿Qué cuesta?** | Espacio, escrituras más lentas, más piezas que mantener |
-| **¿Puedo probarlo y deshacerlo?** | Primero en desarrollo, con `EXPLAIN` antes y después |
+| **¿Qué cuesta?** | Espacio en disco, escrituras más lentas, más cosas que mantener |
 
-### 7.2 Propuestas típicas de la IA y qué revisar
-
-| La IA propone… | Revisa… |
-|---|---|
-| "Añade índices a estas columnas" | ¿Aparecen esas columnas en los `WHERE`, `JOIN` u `ORDER BY` que se usan de verdad? |
-| Un índice en una columna `true`/`false` | Si la mitad de las filas tienen cada valor, la BD lo ignorará |
-| "Quita las `FOREIGN KEY` para ir más rápido" | Ganas muy poco y pierdes la garantía de que los datos son coherentes |
-| "Usa una caché" o "pásate a NoSQL" | ¿Has probado antes un índice? Suele ser la solución más simple |
-| Sintaxis de otro motor | Comprueba que funciona en el tuyo |
-
-### 7.3 Checklist para revisar el código que te da la IA
+### 6.2 Revisa el código que te da
 
 1. **¿Las columnas del `WHERE`, `JOIN` y `ORDER BY` tienen índice?** La IA casi nunca los propone si no se lo pides.
-2. **¿Usa `LIKE '%...'` o funciones sobre columnas en el `WHERE`?**
+2. **¿Usa `LIKE '%...'`?** Pregunta si basta con buscar lo que *empieza* por el texto.
 3. **¿Hay consultas dentro de un bucle?**
-4. **¿Hace `SELECT *` o trae todas las filas sin paginar?**
-5. **¿Cierra las conexiones** (try-with-resources)?
-6. **¿Los tipos de datos son los adecuados** (fechas, dinero)?
+4. **¿Cierra las conexiones** con try-with-resources?
+5. **¿Los tipos de datos son los adecuados?** `DECIMAL` para dinero, `DATE` para fechas.
 
-### 7.4 Pregunta mal vs. pregunta bien
+### 6.3 Pregunta mal vs. pregunta bien
 
 | ❌ Prompt pobre | ✅ Prompt con contexto |
 |---|---|
-| "Haz una consulta que busque pedidos por provincia" | "La tabla `pedido` tendrá unos 2 millones de filas y se busca por provincia y fecha constantemente. Dame la consulta y el índice que necesita, y explícame cómo comprobarlo con `EXPLAIN`." |
-| "Mi aplicación va lenta, optimízala" | "Esta consulta tarda 3 segundos en una tabla de 500.000 filas. Esta es la salida de `EXPLAIN`: [pegar]. ¿Qué índice añadirías y qué coste tendría en los `INSERT`?" |
-
-El buen prompt le da a la IA lo que no sabe: **cuántos datos hay, qué se consulta y qué has medido**.
+| "Haz una consulta que busque pedidos por provincia" | "La tabla `pedido` tendrá unos 2 millones de filas y se busca por provincia constantemente. Dame la consulta y el índice que necesita, y dime qué coste tiene ese índice en los `INSERT`." |
 
 ---
 
-## 8. Practica
+## 7. Practica
 
 | | Pregunta |
 |---|---|
-| A | La pantalla de libros filtra por autor y va lenta. ¿Qué haces primero? |
+| A | La pantalla de libros filtra por autor y va lenta. ¿Qué haces? |
 | B | ¿Necesita índice la columna `isbn` si es `UNIQUE`? |
 | C | ¿Por qué no poner índices en todas las columnas? |
 | D | `WHERE titulo LIKE '%amor%'` va lenta aunque `titulo` tiene índice. ¿Por qué? |
@@ -201,7 +165,7 @@ El buen prompt le da a la IA lo que no sabe: **cuántos datos hay, qué se consu
 
 | | Respuesta |
 |---|---|
-| A | `EXPLAIN` de la consulta. Si lee la tabla entera, índice en `autor_id` |
+| A | Crear un índice en `autor_id`: es la columna del `WHERE` |
 | B | No: `UNIQUE` ya crea un índice |
 | C | Ocupan espacio y hacen más lentos los `INSERT`, `UPDATE` y `DELETE` |
 | D | Con `%` al principio el índice no sirve |
@@ -215,5 +179,5 @@ El buen prompt le da a la IA lo que no sabe: **cuántos datos hay, qué se consu
 ## Resumen en tres frases
 
 1. **Un índice hace que la BD vaya directa a las filas** en vez de leer la tabla entera, pero hace más lentas las escrituras: indexa lo que más se consulta.
-2. **`EXPLAIN` te dice si tu consulta usa el índice**: no lo supongas, compruébalo.
+2. **El tipo de dato y las conexiones también cuentan:** `DECIMAL` para dinero, `DATE` para fechas, y cerrar siempre las conexiones.
 3. **La IA te da consultas que funcionan con 10 filas;** tú tienes que pensar en cómo irán con millones.
