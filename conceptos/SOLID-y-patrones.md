@@ -599,6 +599,7 @@ Para decidir, pregúntate **quién crea el objeto**:
 |---|---|---|
 | Modelo (`Producto`, `Libro`) | **Tú**: mapper, `mapRow`, tests | ✅ Sí |
 | DTO de formulario (`ProductoForm`, `LibroDto`) | **Spring** al enviar el formulario (POST)<br>**Tú** en `mapper.toDto` para rellenar el formulario de edición | ✅ Sí, para el `toDto`, **sin quitar** `@NoArgsConstructor` (lo usa Spring) |
+| Entidad JPA (UT04) | **Hibernate** al leer de la BD<br>**Tú** al crear una nueva para guardarla | ✅ Sí, con `@NoArgsConstructor` (lo usa Hibernate) y `@Builder.Default` en las listas |
 | Clase con 2 o 3 atributos de tipos distintos (`Autor`) | Tú | Opcional: `new Autor(1, "Cortázar")` ya se lee bien. Si el resto del proyecto usa builder, úsalo también por coherencia |
 | Componentes (`@Service`, `@Repository`...) | **Spring** | ❌ Nunca |
 
@@ -619,8 +620,43 @@ public LibroDto toDto(Libro libro) {
 public String guardar(@Valid @ModelAttribute LibroDto libroDto, BindingResult errores) { ... }
 ```
 
+> **Para la UT04: Builder en entidades JPA.** Es el mismo caso que el DTO. Hibernate crea la entidad al leer de la BD con el **constructor vacío + setters**, y tú la creas con el builder. Hay que tener cuidado con tres cosas:
+>
+> 1. **`@NoArgsConstructor`, obligatorio.** Sin él, Hibernate no puede crear la entidad y falla al leer de la BD.
+> 2. **Las listas inicializadas necesitan `@Builder.Default`.** Si no, el builder ignora el `= new ArrayList<>()` y la lista queda a `null`.
+> 3. **Relaciones bidireccionales y `@Data`.** Si `Autor` tiene sus `libros` y cada `Libro` tiene su `autor`, `toString()` y `hashCode()` se llaman entre sí sin fin y provocan un `StackOverflowError`. Excluye la lista con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`.
+>
+> ```java
+> @Entity
+> @Data
+> @Builder
+> @NoArgsConstructor                         // ← lo usa Hibernate
+> @AllArgsConstructor                        // ← lo usa @Builder
+> public class Autor {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Integer id;
+>
+>     private String nombre;
+>
+>     @OneToMany(mappedBy = "autor")
+>     @Builder.Default                       // ← sin esto, libros = null
+>     @ToString.Exclude                      // ← evitan el bucle infinito
+>     @EqualsAndHashCode.Exclude             //   con Libro.autor
+>     private List<Libro> libros = new ArrayList<>();
+> }
+> ```
+>
+> ```java
+> Autor autor = Autor.builder().nombre("Cortázar").build();
+> autor.getLibros().add(libro);              // sin @Builder.Default: NullPointerException
+> ```
+
 > ⚠️ **Builder evita los errores de orden, no los olvidos.** Si añades un atributo nuevo (por ejemplo, `ejemplares`), todo sigue compilando: busca con `Alt + F7` los usos de `Libro.builder()` y añádelo donde haga falta.
+
 ---
+
 
 ## 5. Chuleta de IntelliJ (Windows y Linux)
 
