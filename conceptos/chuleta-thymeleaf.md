@@ -388,3 +388,84 @@ Spring Boot usa `templates/error.html` para los errores no controlados y le pasa
 | `<!--/* ... */-->` | Comentario de Thymeleaf: se **elimina** al procesar la plantilla |
 
 
+---
+## `${param}` en Thymeleaf
+
+`param` es un **objeto implícito** de Thymeleaf que da acceso a los **parámetros de la petición HTTP**.
+
+```html
+<span th:text="${param.titulo}"></span>
+```
+
+equivale aproximadamente a `request.getParameterValues("titulo")` en Java.
+
+## ¿De dónde salen los parámetros?
+
+Los recoge **tanto de GET como de POST**, no solo de GET:
+
+| Origen | Ejemplo | ¿Lo recoge `param`? |
+|---|---|---|
+| Query string (GET) | `/buscar?titulo=Quijote` | ✅ |
+| Formulario POST (`application/x-www-form-urlencoded`) | `<input name="titulo">` | ✅ |
+| Cuerpo JSON | `{"titulo":"Quijote"}` | ❌ |
+| Variables de ruta | `/libros/{id}` | ❌ (eso es `@PathVariable`) |
+| Atributos del Model | `model.addAttribute("libro", …)` | ❌ (se usa `${libro}`) |
+
+> En una vista renderizada tras un POST, `param` contiene los campos que se enviaron en el formulario.
+
+## Siempre devuelve varios valores
+
+Un parámetro puede repetirse (`?tag=java&tag=spring`), así que en Thymeleaf
+**`param.X` es una colección de valores**, no un `String`.
+
+| Expresión | Resultado con `?tag=java&tag=spring` |
+|---|---|
+| `${param.tag}` | `java,spring` (los valores unidos por comas) |
+| `${param.tag[0]}` | `java` |
+| `${param.tag[1]}` | `spring` |
+| `${param.tag.length}` | `2` |
+
+**Regla práctica:** si esperas un único valor, usa `${param.X[0]}`.
+
+Si el parámetro **no existe**, `${param.X}` es `null`. No se lanza una excepción.
+
+## Métodos útiles
+
+```html
+${param.containsKey('error')}   <!-- ¿existe el parámetro? -->
+${param.isEmpty()}              <!-- ¿la petición no trae ningún parámetro? -->
+${param.size()}                 <!-- número de parámetros distintos -->
+```
+
+
+### ⚠️ Seguridad: XSS
+
+Los parámetros los controla el usuario. Cualquiera puede escribir `?titulo=<script>alert(1)</script>`.
+
+No hay peligro si lo muestras con `th:text`, porque **escapa el HTML automáticamente**.
+El script aparece en pantalla como texto y no se ejecuta:
+
+```html
+<strong th:text="${param.titulo[0]}"></strong>
+```
+
+## Nota sobre Thymeleaf 3.1 / Spring Boot 3
+
+En Thymeleaf 3.1 **se eliminaron** los objetos `#request`, `#response`, `#session` y
+`#servletContext`. Por tanto, `${#request.getParameter('x')}` **ya no funciona**.
+
+Siguen disponibles:
+- `${param.X}`: parámetros de la petición
+- `${session.X}`: atributos de sesión
+- `${application.X}`: atributos de la aplicación
+
+Usa siempre `param` para leer los parámetros de la petición.
+
+### Resumen
+
+| Quiero… | Expresión |
+|---|---|
+| Saber si existe un parámetro | `th:if="${param.X}"` |
+| Leer su valor | `${param.X[0]}` |
+| Leer todos sus valores | `${param.X}` (o recorrerlo con `th:each`) |
+| Mostrarlo de forma segura | `th:text="${param.X[0]}"` |
