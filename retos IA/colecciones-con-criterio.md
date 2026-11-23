@@ -146,7 +146,7 @@ Java reutiliza los objetos `Long` pequeños (del -128 al 127), por eso con ids b
 
 Colecciones de elementos **sin duplicados**. Comprobar si un elemento está es O(1).
 
-**Caso práctico: los roles de un usuario.** Un usuario no puede tener dos veces el rol `ADMIN`. Ahora cada usuario tiene un solo rol, pero cuando pueda tener varios, serán un `Set`:
+**Caso práctico: los roles de un usuario.** Un usuario no puede tener dos veces el rol `ADMIN`:
 
 ```java
 Set<String> roles = new HashSet<>();
@@ -268,34 +268,8 @@ Además, un `Set` impide asignar dos veces el mismo rol.
 
 ---
 
-## 7. Usar la IA con criterio
 
-### 7.1 Checklist para revisar el código que te da la IA
-
-1. **¿Trae datos de la BD para filtrarlos, ordenarlos o contarlos en Java?** Eso es un `WHERE`, un `ORDER BY` o un `GROUP BY`.
-2. **¿Recorre una `List` para buscar por clave o para evitar repetidos?** Piensa en `Map` o `Set`.
-3. **¿Mete objetos tuyos en un `Set` o como clave de un `Map`?** ¿Tienen `equals()` y `hashCode()` por la clave de negocio?
-4. **¿Usa `@Data` donde importa la igualdad?**
-5. **¿Usa clases antiguas?**
-
-| Si la IA propone… | Hoy se usa… |
-|---|---|
-| `Stack` | `ArrayDeque` |
-| `Vector` | `ArrayList` |
-| `Hashtable` | `HashMap` |
-
-### 7.2 Pregunta mal vs. pregunta bien
-
-| ❌ Prompt pobre | ✅ Prompt con contexto |
-|---|---|
-| "Haz un carrito de la compra" | "Haz un carrito guardado en la sesión. Cada producto aparece una vez con su cantidad, en el orden en que se añadió. ¿Qué colección uso y por qué?" |
-| "Muestra los pedidos urgentes primero" | "Añade al repositorio JDBC un método que devuelva los pedidos pendientes, los urgentes primero y después por fecha, ordenados en la consulta SQL." |
-
-El buen prompt ya dice **dónde** se hace cada cosa: en la BD o en memoria.
-
----
-
-## 8. Practica: ¿colección de Java o SQL?
+## 7. Practica: ¿colección de Java o SQL?
 
 | | Situación |
 |---|---|
