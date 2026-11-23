@@ -121,7 +121,7 @@ lineas.remove(productoId);                           // quitar un producto
 
 **¿Por qué el `Map` si un carrito tiene pocos productos?** No es por velocidad: con 5 o 10 productos, recorrer la lista o ir directo por la clave tarda lo mismo. Se recomienda el `Map` porque **evita código innecesario**. Con la `List` necesitas un bucle, un `if` y un `return` para algo que el `Map` hace en una línea, y cada línea de más es un sitio donde puede colarse un fallo. Además, el `Map` garantiza que cada producto aparece una sola vez: con la `List`, un error en el bucle puede añadir el mismo producto dos veces.
 
-**Un fallo que puede esconder el bucle de la `List`:**
+**Un fallo típico: si en ese bucle se hubiera escrito `==` en vez de `equals()`:**
 
 ```java
 if (linea.getProductoId() == productoId)   // ❌ los dos son Long
@@ -250,9 +250,9 @@ private List<Libro> libros = new ArrayList<>();
 
 Además, un `Set` impide asignar dos veces el mismo rol.
 
-**¿Y en uno a muchos?** Cada libro es una fila de su propia tabla, así que JPA lo borra o actualiza uno a uno. Una `List` funciona bien.
+**¿Y en uno a muchos?** Cada libro es una fila de su propia tabla: no puede venir repetido, y JPA lo borra o actualiza uno a uno. Un `Set` no aportaría nada y te obligaría a tener `equals()` y `hashCode()` perfectos. Una `List` es lo más sencillo y además mantiene el orden.
 
-**Si usas `Set`, `equals()` y `hashCode()` por la clave de negocio (apartado 4.3), nunca por el `id`.** El `id` lo genera la base de datos: vale `null` hasta que guardas el objeto, y después cambia. Si metiste el objeto en un `HashSet` antes de guardarlo, al cambiar el `id` queda en la "estantería" equivocada y `contains()` ya no lo encuentra.
+**Si usas `Set`, haz `equals()` y `hashCode()` con la clave de negocio (apartado 4.3), no con el `id`.** El `id` lo asigna la base de datos al guardar: antes vale `null` y después tiene un valor. Si metes el objeto en un `HashSet` antes de guardarlo, el `HashSet` lo coloca en la "estantería" que corresponde a `id = null`. Al guardarlo, el `id` cambia y `hashCode()` apunta a otra estantería, pero el objeto sigue en la antigua: `contains()` y `remove()` ya no lo encuentran. La clave de negocio (`username`, ISBN) tiene valor desde que creas el objeto y no cambia.
 
 ---
 
@@ -302,7 +302,7 @@ Además, un `Set` impide asignar dos veces el mismo rol.
 
 1. **Buscar, filtrar, ordenar y contar se hace en la base de datos**, no trayendo la tabla a memoria.
 2. **`List` para resultados, `Map` para buscar por clave, `Set` para elementos únicos**, y `equals()`/`hashCode()` siempre por la clave de negocio.
-3. **La IA da código que funciona; tú decides si sirve.** Para eso te basta con hacerte las preguntas de la checklist.
+3. **La IA da código que funciona; tú decides si sirve.** Pregúntate: ¿esto lo debería hacer la base de datos?, ¿necesito buscar por clave o evitar repetidos?, ¿cómo se comparan mis objetos?
 
 ---
 
