@@ -174,7 +174,7 @@ Casos que no usamos en la práctica, pero que verás en proyectos reales.
 | Caso | Bloque | Configuración |
 |---|---|---|
 | El campo del formulario se llama `email`, no `username` | `formLogin` | `.usernameParameter("email")` |
-| Ir **siempre** a `/libros` tras entrar, aunque el usuario viniera de otra página | `formLogin` | `.defaultSuccessUrl("/libros", true)` |
+| Ir **siempre** a `/libros` tras entrar, aunque el usuario viniera de otra página. Si Ana escribe /autores sin haber iniciado sesión, Spring la manda al login pero se apunta adónde quería ir: al entrar, la devuelve a /autores. Con true, se olvida de eso y la manda siempre a /libros. | `formLogin` | `.defaultSuccessUrl("/libros", true)` |
 | Si falla el login, ir a otra URL en vez de `/login?error` | `formLogin` | `.failureUrl("/login?fallo")` |
 | Volver a la portada tras salir | `logout` | `.logoutSuccessUrl("/")` |
 | Borrar cookies al salir | `logout` | `.deleteCookies("JSESSIONID")` |
