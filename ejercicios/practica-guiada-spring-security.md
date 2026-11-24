@@ -425,18 +425,7 @@ Fíjate:
 - `luis` está **desactivado** (`activo = false`).
 - Los roles van **sin** prefijo `ROLE_`.
 
-> **¿Y si quiero otra contraseña?** Genera el hash cambiando temporalmente el bean del paso 3.1:
->
-> ```java
-> @Bean
-> public PasswordEncoder passwordEncoder() {
->     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
->     System.out.println(encoder.encode("1234"));   // copia el hash de la consola
->     return encoder;
-> }
-> ```
->
-> Arranca dos veces: ¿sale el mismo hash? **Nunca** escribas la contraseña en claro en la lista: si pones `"1234"`, el login fallará y en la consola verás el aviso `Encoded password does not look like BCrypt`.
+> Los hashes ya vienen generados. **Nunca** escribas la contraseña en claro en la lista: si pones `"1234"`, el login fallará y en la consola verás el aviso `Encoded password does not look like BCrypt`.
 
 ### 3.5 Nuestro `UserDetailsService`
 
@@ -856,34 +845,3 @@ src/test/java/es/daw/bibliotecajdbc/
 
 Fíjate en lo que **no** hemos tocado por la seguridad: ningún controlador ni servicio de libros o autores. Los cambios en mappers y repositorios del paso 3.0 son una refactorización, no seguridad. La seguridad se añade **alrededor** de la aplicación, en los filtros, sin mezclarse con la lógica de negocio.
 
-## Errores típicos
-
-| Síntoma | Causa probable |
-|---|---|
-| El login no funciona con ningún usuario | Hay dos `UserDetailsService`, falta el bean `PasswordEncoder` o falta `@Service` en `UsuarioDetailsService`. |
-| Consola: `Encoded password does not look like BCrypt` | En `UsuarioRepositoryMemoria` hay una contraseña en claro en vez del hash. |
-| Un formulario da 403 aunque el usuario tenga permiso | El formulario usa `action` en vez de `th:action`: falta el token CSRF. |
-| Excepción: `ROLE_ADMIN cannot start with ROLE_` | El rol está guardado con prefijo y usas `.roles(...)`. |
-| Nadie tiene permiso aunque el rol es correcto | Mezcla de `.authorities("ADMIN")` con `hasRole("ADMIN")`. |
-| Un USER puede editar o borrar | Una regla general (`/libros/**`) está antes que la concreta de ADMIN. |
-| La página de login sale sin estilos | Falta `/vendor/**` (o `/css/**`) en `permitAll()`. |
-| La página 403 no se ve, sale el login | Falta `/error` en `permitAll()`. |
-| La consola H2 se queda en blanco | Faltan las excepciones de `csrf` o de `frameOptions` para `/h2-console/**`. |
-| Código copiado de internet no compila | Usa APIs eliminadas en Spring Security 7 (`WebSecurityConfigurerAdapter`, `authorizeRequests`, `antMatchers`, `.and()`). Ver la teoría. |
-
-## Imports que pueden confundir
-
-| Clase | Elige |
-|---|---|
-| `User` | `org.springframework.security.core.userdetails.User` |
-| `UserDetails`, `UserDetailsService`, `UsernameNotFoundException` | `org.springframework.security.core.userdetails` |
-| `PasswordEncoder` | `org.springframework.security.crypto.password.PasswordEncoder` |
-| `BCryptPasswordEncoder` | `org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder` |
-| `SecurityFilterChain` | `org.springframework.security.web.SecurityFilterChain` |
-| `HttpSecurity` | `org.springframework.security.config.annotation.web.builders.HttpSecurity` |
-| `AutoConfigureMockMvc` | `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc` (nuevo paquete en Boot 4) |
-| `csrf()` (estático) | `SecurityMockMvcRequestPostProcessors.csrf` |
-| `formLogin()` (estático) | `SecurityMockMvcRequestBuilders.formLogin` |
-| `authenticated()`, `unauthenticated()` (estáticos) | `SecurityMockMvcResultMatchers` |
-| `get()`, `post()` (estáticos) | `MockMvcRequestBuilders` |
-| `status()`, `redirectedUrl()`, `redirectedUrlPattern()` (estáticos) | `MockMvcResultMatchers` |
