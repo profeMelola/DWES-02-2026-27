@@ -126,6 +126,21 @@ public class SecurityConfig {
     }
 }
 ```
+> **¿Cómo se lee esta configuración?** `http` funciona como un builder: vamos encadenando bloques y al final `http.build()` construye la cadena de filtros.
+>
+> Cada bloque configura una parte de la seguridad (un filtro):
+>
+> | Bloque | Qué configura |
+> |---|---|
+> | `authorizeHttpRequests(auth -> ...)` | Quién puede entrar a cada URL |
+> | `formLogin(form -> ...)` | El formulario de login |
+> | `logout(logout -> ...)` | El cierre de sesión |
+> | `csrf(csrf -> ...)` | La protección CSRF |
+> | `headers(headers -> ...)` | Las cabeceras de seguridad |
+>
+> Dentro de cada bloque, `form`, `logout`, `csrf`... son el objeto que configura esa parte. Lo que escribes dentro de los paréntesis solo afecta a ese bloque.
+>
+> Si en internet ves el estilo antiguo, con `.and()` entre bloques, no lo copies: ya no compila en Spring Security 7.
 
 > **¿Qué es `@Bean`?** Hasta ahora, para que Spring gestionara una clase nuestra le poníamos `@Component`, `@Service`, `@Repository` o `@Controller`. Pero `SecurityFilterChain` o `BCryptPasswordEncoder` son clases **de Spring Security**: no podemos abrirlas para anotarlas. Además, hay que configurarlas antes de usarlas.
 >
