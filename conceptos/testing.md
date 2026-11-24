@@ -27,7 +27,7 @@ Reglas de oro: **un comportamiento por test** y un nombre que se lea como una fr
 | **Velocidad** | Milisegundos | Segundos | La más lenta |
 | **Si falla, el fallo está…** | En esa clase | En esa capa | En algún sitio |
 
-**La pirámide de tests:** muchas unitarias en la base (baratas y precisas) y pocas de integración arriba (caras, pero prueban que todo encaja).
+**La pirámide de tests:** muchas unitarias en la base (rápidas y, si fallan, sabes dónde) y pocas de integración arriba (lentas y más difíciles de diagnosticar, pero prueban que todo encaja).
 
 ### `SeguridadTest` es una prueba de integración
 
