@@ -706,6 +706,8 @@ En el `pom.xml`:
 
 ### 6.2 La clase de test
 
+Apoyo teoría [Testing](../conceptos/testing.md)
+
 Crea `src/test/java/es/daw/bibliotecajdbc/SeguridadTest.java`:
 
 ```java
@@ -798,7 +800,6 @@ class SeguridadTest {
 | `formLogin("/login").user(...).password(...)` | Hace un login **de verdad**: usa nuestro `UsuarioDetailsService`, BCrypt y los usuarios de `UsuarioRepositoryMemoria`. Prueba la **autenticación**. |
 | `authenticated()` / `unauthenticated()` | Comprueban si, tras la petición, hay alguien autenticado. |
 
-> **¿Por qué `redirectedUrlPattern("**/login")` y no `redirectedUrl("/login")`?** Según la versión, Spring Security redirige con la URL completa (`http://localhost/login`) o relativa (`/login`). El patrón vale para las dos.
 
 Ejecuta los tests desde IntelliJ (botón ▶ junto a la clase) o con `./mvnw test`. Deben pasar los 10.
 
