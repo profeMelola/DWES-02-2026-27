@@ -166,6 +166,23 @@ public class SecurityConfig {
 
 > ⚠️ La consola H2 abierta y sin CSRF es **solo para desarrollo**. En producción no existiría.
 
+
+### Otras configuraciones habituales en `SecurityConfig`
+
+Casos que no usamos en la práctica, pero que verás en proyectos reales.
+
+| Caso | Bloque | Configuración |
+|---|---|---|
+| El campo del formulario se llama `email`, no `username` | `formLogin` | `.usernameParameter("email")` |
+| Ir **siempre** a `/libros` tras entrar, aunque el usuario viniera de otra página | `formLogin` | `.defaultSuccessUrl("/libros", true)` |
+| Si falla el login, ir a otra URL en vez de `/login?error` | `formLogin` | `.failureUrl("/login?fallo")` |
+| Volver a la portada tras salir | `logout` | `.logoutSuccessUrl("/")` |
+| Borrar cookies al salir | `logout` | `.deleteCookies("JSESSIONID")` |
+| Regla distinta según el método HTTP (GET libre, POST solo ADMIN) | `authorizeHttpRequests` | `.requestMatchers(HttpMethod.GET, "/libros/**").permitAll()` y `.requestMatchers(HttpMethod.POST, "/libros/**").hasRole("ADMIN")` |
+| Toda una zona de administración solo para ADMIN | `authorizeHttpRequests` | `.requestMatchers("/admin/**").hasRole("ADMIN")` |
+| Cerrar todo lo no previsto (más estricto que `authenticated()`) | `authorizeHttpRequests` | `.anyRequest().denyAll()` al final |
+| Cambiar el tiempo de caducidad de la sesión | — | No va en `SecurityConfig`: `server.servlet.session.timeout=15m` en `application.properties` |
+
 ### 2.2 La vista de login (sin controlador)
 
 La vista no tiene lógica, así que va en `WebConfig`, igual que la portada:
