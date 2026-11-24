@@ -722,7 +722,7 @@ class SeguridadTest {
     void anonimoEsRedirigidoAlLogin() throws Exception {
         mockMvc.perform(get("/libros"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("**/login"));
+                .andExpect(redirectedUrl("/login"));
     }
 
     @Test
@@ -755,6 +755,7 @@ class SeguridadTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void adminPuedeBorrar() throws Exception {
+        // Ojo: borra de verdad el libro de H2. Usa un ISBN que ningún otro test necesita.
         mockMvc.perform(post("/libros/borrar/9788490001479").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/libros"));
