@@ -582,6 +582,15 @@ En cada plantilla donde uses `sec:`, añade el espacio de nombres a la etiqueta 
 | `sec:authorize="hasRole('ADMIN')"` | Mostrar solo a ADMIN. |
 | `sec:authentication="name"` | Escribir el nombre del usuario. |
 
+
+> **Otra forma: los objetos `#authorization` y `#authentication`.** La misma dependencia permite escribirlo con `th:if` y `th:text`, sin atributos `sec:`. Hace lo mismo, pero es más largo, y dentro de la expresión hay que doblar las comillas (`''ADMIN''`). Nosotros usamos `sec:` porque es más corto y sencillo, pero puedes encontrarte esta forma:
+>
+> ```html
+> <div th:if="${#authorization.expression('isAuthenticated()')}">...</div>
+> <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/libros/nuevo}">Añadir libro</a>
+> <span th:text="${#authentication.name}">usuario</span>
+> ```
+
 ### 5.2 La barra de navegación
 
 En `fragments/layout.html`, **sustituye el formulario provisional de logout** del paso 2 por esto:
