@@ -9,4 +9,5 @@
 - [Algoritmos y complejidad](./algoritmos-y-complejidad.md)
 - [Colecciones con criterio](./colecciones-con-criterio.md)
 - [BD Relacionales en producción](./base-de-datos-en-produccion.md)
+- [Casos de prueba con criterio](./casos-de-prueba-con-criterio.md)
   
