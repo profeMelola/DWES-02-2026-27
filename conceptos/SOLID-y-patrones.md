@@ -371,6 +371,21 @@ public class ProductoRepositoryListaMemoria implements ProductoRepository {
 
 > **Inyección por constructor, siempre.** Nada de `@Autowired` sobre atributos: IntelliJ te avisa con *Field injection is not recommended*. Cuando domines el constructor explícito puedes sustituirlo por `@RequiredArgsConstructor` de Lombok con atributos `final`.
 
+
+##### Inversión de dependencias (DIP) e inyección de dependencias (DI)
+
+Se parecen en el nombre, pero no son lo mismo:
+
+| | Inversión de dependencias (DIP, la "D" de SOLID) | Inyección de dependencias (DI) |
+|---|---|---|
+| Qué es | Un **principio**: cómo diseñar | Una **técnica**: cómo conseguir los objetos que usas |
+| Dice | Depende de **interfaces**, no de clases concretas | No hagas `new`: que te den los objetos **desde fuera** (por el constructor) |
+| Pregunta que responde | ¿*De qué* dependo? | ¿*Quién* me da lo que necesito? |
+| Spring | No lo hace por ti: es una decisión tuya al diseñar | Lo hace por ti: es su contenedor |
+| Ejemplo en el proyecto | `UsuarioDetailsService` depende de la interfaz `UsuarioRepository` | Spring le pasa por el constructor la implementación (`UsuarioRepositoryMemoria`) |
+
+> **DIP es *de qué* dependes (de una interfaz); DI es *cómo* te llega (te la inyecta Spring).** Juntas permiten cambiar una implementación por otra sin tocar las clases que la usan. Por eso en la UT04 sustituiremos `UsuarioRepositoryMemoria` por una versión con JPA y `UsuarioDetailsService` no cambiará.
+
 ---
 
 ## 4. Patrones a usar
