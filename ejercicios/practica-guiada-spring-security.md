@@ -539,12 +539,12 @@ Claves:
 |---|---|---|---|
 | `/` | ✅ | ✅ | ✅ |
 | `/libros` y filtrar | → login | ✅ | ✅ |
-| `/libros/nuevo` | → login | ❌ 403 | ✅ |
-| Escribir `/libros/editar/9788490000496` | → login | ❌ 403 | ✅ |
-| Pulsar el botón de borrar | — | ❌ 403 | ✅ |
-| `/autores/editar/1` | → login | ❌ 403 | ✅ |
+| `/libros/nuevo` | → login | ❌  | ✅ |
+| Escribir `/libros/editar/9788490000496` | → login | ❌  | ✅ |
+| Pulsar el botón de borrar | — | ❌  | ✅ |
+| `/autores/editar/1` | → login | ❌  | ✅ |
 
-De momento, el 403 muestra la página de error genérica de la aplicación ("Se ha producido un error inesperado"). Lo mejoramos en el paso 5.
+De momento, el  muestra la página de error genérica de la aplicación ("Se ha producido un error inesperado"). Lo mejoramos en el paso 5.
 
 > **Reto 1.** Mueve la regla `.requestMatchers("/libros", "/autores").hasAnyRole(...)` y cámbiala por `.requestMatchers("/libros/**", "/autores/**").hasAnyRole(...)`, colocándola **antes** de las de ADMIN. Entra como `ana` e intenta borrar. ¿Qué pasa? ¿Por qué? Déjalo como estaba.
 
@@ -552,7 +552,7 @@ De momento, el 403 muestra la página de error genérica de la aplicación ("Se 
 
 ---
 
-## Paso 5: vistas, `sec:authorize` y página 403
+## Paso 5: vistas, `sec:authorize` y página 
 
 ### 5.1 La dependencia
 
@@ -643,7 +643,9 @@ Haz lo mismo en `autores/lista.html` (botón "Añadir autor", cabeceras "Editar"
 
 ### 5.4 Página 403
 
-Spring Boot busca automáticamente una plantilla con el código de error en `templates/error/`. Crea `templates/error/403.html`:
+Spring busca primero la página del código exacto (error/403.html), luego la de la familia (error/4xx.html) y, si no hay ninguna, la genérica (error.html).
+
+Crea `templates/error/403.html`:
 
 ```html
 <!DOCTYPE html>
