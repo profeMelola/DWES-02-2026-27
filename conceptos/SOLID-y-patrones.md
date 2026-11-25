@@ -324,7 +324,7 @@ public class DescargaService {
 ```
 
 ---
-### D · Dependency Inversion (inversión de dependencias)
+### D · Dependency Inversion (inversión de dependencias DIP)
 
 **Regla:** los componentes de alto nivel (el servicio) dependen de **interfaces**, no de implementaciones concretas. Y nunca hacen `new` de otro componente: **Spring lo crea y se lo inyecta**.
 
