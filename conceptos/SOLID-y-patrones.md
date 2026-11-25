@@ -39,6 +39,14 @@ Regla de oro: **las flechas van siempre hacia la derecha**. El controlador conoc
 
 ## 3. Los cinco principios SOLID
 
+| Principio | En una frase |
+|---|---|
+| [**S** · Single Responsibility](#s--single-responsibility-una-sola-responsabilidad) | Una clase, un solo motivo para cambiar |
+| [**O** · Open/Closed](#o--openclosed-abierto-a-ampliar-cerrado-a-modificar) | Ampliar sin modificar lo que ya funciona |
+| [**L** · Liskov Substitution](#l--liskov-substitution-sustitución) | Cualquier implementación debe cumplir lo que promete la interfaz |
+| [**I** · Interface Segregation](#i--interface-segregation-interfaces-pequeñas) | Interfaces pequeñas: nadie implementa métodos que no usa |
+| [**D** · Dependency Inversion](#d--dependency-inversion-inversión-de-dependencias-dip) | Depender de interfaces, no de clases concretas ([DIP y DI](#inversión-de-dependencias-dip-e-inyección-de-dependencias-di)) |
+
 ### S · Single Responsibility (una sola responsabilidad)
 
 **Regla:** una clase debe tener **un solo motivo para cambiar**.
