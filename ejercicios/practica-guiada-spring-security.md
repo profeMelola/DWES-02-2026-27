@@ -694,7 +694,7 @@ La biblioteca contrata a `marta`, que se encarga del catálogo: puede **dar de a
 1. Añade a `marta` (contraseña `1234`) en `UsuarioRepositoryMemoria`. Pista: puedes reutilizar el hash de otro usuario. ¿Por qué funciona?
 2. Cambia las reglas de `SecurityConfig` para cumplir la tabla.
 3. Ajusta las vistas: `marta` ve "Añadir" y "Editar", pero no "Borrar".
-4. Añade a `SeguridadTest` al menos tres tests para `marta`: puede abrir `/libros/nuevo`, puede guardar, **no** puede borrar (403).
+4. (Después del siguiente apartado de testing) Añade a `SeguridadTest` al menos tres tests para `marta`: puede abrir `/libros/nuevo`, puede guardar, **no** puede borrar (403).
 
 ### Comprueba
 
