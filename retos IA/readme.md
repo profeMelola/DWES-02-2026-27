@@ -4,7 +4,8 @@
 
 <sub>Fuente:https://www.cambio16.com/uso-excesivo-de-ia-podria-disminuir-el-pensamiento-critico/</sub>
 
-
+- [Reflexión](./reflexion.md)
+- [Guía uso IA para programar](./guia-uso-ia-programacion.md)
 - [Requisitos vagos](./requisitos-vagos.md)
 - [Algoritmos y complejidad](./algoritmos-y-complejidad.md)
 - [Colecciones con criterio](./colecciones-con-criterio.md)
