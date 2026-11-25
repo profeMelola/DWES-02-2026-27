@@ -468,11 +468,10 @@ Lo que hace Spring con esta clase en cada login:
 
 Con este servicio y el `PasswordEncoder`, Spring Boot ya sabe autenticar. **No hace falta** declarar `AuthenticationProvider` ni `AuthenticationManager`.
 
-> **SOLID: responsabilidad única (SRP).** `Usuario` no implementa `UserDetails`. Representar un usuario de la biblioteca y adaptarlo a Spring Security son dos responsabilidades, y cada una tiene su clase. `UsuarioDetailsService` hace de **adaptador**. (Ver el apartado 7 de la teoría.)
+> **SOLID: responsabilidad única (SRP).** `Usuario` no implementa `UserDetails`. Representar un usuario de la biblioteca y adaptarlo a Spring Security son dos responsabilidades, y cada una tiene su clase. `UsuarioDetailsService` hace de **adaptador**.
 
 > **SOLID: inversión de dependencias (DIP).** El servicio depende de la **interfaz** `UsuarioRepository`, no de `UsuarioRepositoryMemoria`. Por eso en la UT04 podremos cambiar la lista por una base de datos sin tocarlo.
 
-> ⚠️ **Error típico.** Debe haber **un solo** `UserDetailsService`. Si declaras otro (por ejemplo, copiando un ejemplo de internet con `InMemoryUserDetailsManager`), Spring Boot no sabe cuál usar y **no configura la autenticación**: ningún login funcionará.
 
 ### Comprueba
 
