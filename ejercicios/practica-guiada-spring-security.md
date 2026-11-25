@@ -681,6 +681,32 @@ Funciona gracias a que en el paso 2 abrimos `/error` con `permitAll()`: Spring S
 > **Reto 3: ocultar un botón no protege.** En `SecurityConfig`, comenta las dos reglas `hasRole("ADMIN")`. Entra como `ana`: los botones siguen ocultos. Ahora escribe en el navegador `/libros/editar/9788490000496`, cambia el título y guarda. ¿Qué ha pasado? Explica qué protege `sec:authorize` y qué protege la `SecurityFilterChain`. Vuelve a descomentar las reglas.
 
 ---
+## Reto: el rol BIBLIOTECARIO
+
+La biblioteca contrata a `marta`, que se encarga del catálogo: puede **dar de alta y editar** libros y autores, pero **no borrar**. Solo `admin` puede borrar.
+
+| Quién | Consultar | Alta y edición | Borrar |
+|---|---|---|---|
+| `ana` (USER) | ✅ | ❌ | ❌ |
+| `marta` (BIBLIOTECARIO) | ✅ | ✅ | ❌ |
+| `admin` (ADMIN) | ✅ | ✅ | ✅ |
+
+1. Añade a `marta` (contraseña `1234`) en `UsuarioRepositoryMemoria`. Pista: puedes reutilizar el hash de otro usuario. ¿Por qué funciona?
+2. Cambia las reglas de `SecurityConfig` para cumplir la tabla.
+3. Ajusta las vistas: `marta` ve "Añadir" y "Editar", pero no "Borrar".
+4. Añade a `SeguridadTest` al menos tres tests para `marta`: puede abrir `/libros/nuevo`, puede guardar, **no** puede borrar (403).
+
+### Comprueba
+
+| Prueba | `ana` | `marta` | `admin` |
+|---|---|---|---|
+| `/libros/nuevo` | 403 | ✅ | ✅ |
+| Editar un libro y guardar | 403 | ✅ | ✅ |
+| Borrar un libro | 403 | 403 | ✅ |
+| Botón "Borrar" visible | No | No | Sí |
+
+> **Para pensar.** ¿Has tenido que tocar `UsuarioDetailsService`? ¿Por qué no?
+---
 
 ## Paso 6: tests con MockMvc y `@WithMockUser`
 
