@@ -27,6 +27,7 @@ En esta unidad damos el salto de Servlet/JSP a **Spring Boot + Spring MVC + Thym
 - [Validaciones](./conceptos/validaciones.md)
 - [Spring Security](./conceptos/spring-security.md)
 - [Testing](./conceptos/testing.md)
+- [Debugging](./conceptos/debugging.md)
   
 
 ## Práctica
