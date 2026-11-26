@@ -106,8 +106,4 @@ El listado `/libros` tiene un filtro por rango de años (`anioDesde`, `anioHasta
 
 ---
 
-## Resumen en tres frases
 
-1. **Un test verde solo dice que el código hace lo que el test espera**, no que el código esté bien.
-2. **Primero decides los casos y su resultado correcto**, en castellano; luego tú o la IA los convertís en tests.
-3. **Rompe el código a propósito**: si el test no se pone en rojo, no está probando nada.
