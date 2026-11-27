@@ -10,7 +10,36 @@ En Spring MVC se resumen en tres hábitos:
 2. **Dependes de interfaces, no de implementaciones** y dejas que Spring te inyecte lo que necesitas.
 3. **Si añadir una función obliga a modificar código que ya funciona, algo está mal diseñado.**
 
-> En los ejemplos se omiten los `import` y el `throws SQLException` para que el código se lea mejor.
+
+### ¿Para qué aprender esto si ya tengo Spring (y la IA)?
+
+Es verdad que **nadie escribe a mano** un Singleton o un Proxy en un proyecto Spring: el framework ya los trae hechos. Pero eso no significa que no se usen. Significa que **están escondidos**. Spring está construido con estos principios y patrones, y cada vez que lo usas estás aplicándolos, lo sepas o no:
+
+| Lo que haces en tus proyectos | Lo que hay debajo | Dónde lo has visto |
+|---|---|---|
+| Inyectar por constructor la **interfaz** del repositorio | Inversión de dependencias (**D**) | Todos los proyectos |
+| Separar controller, service y repository | Responsabilidad única (**S**) | Todos los proyectos |
+| `UsuarioRepository` solo con `findByUsername` | Segregación de interfaces (**I**) | Práctica de Spring Security, paso 3 |
+| `UsuarioDetailsService` traduce tu `Usuario` a lo que espera Spring | **S** + patrón **Adapter** | Práctica de Spring Security, paso 3 |
+| `Libro.builder()`, `User.builder()` | Patrón **Builder** | Práctica de Spring Security, paso 3 |
+| Un `@Service` que no guarda datos de usuario | Patrón **Singleton** | [Singleton: cuidado con el estado](#singleton-cuidado-con-el-estado) |
+| `@Transactional` que "no funciona" si lo llamas desde la misma clase | Patrón **Proxy** | UT04 (si no sabes que existe, pierdes un día buscando el fallo) |
+
+Cuando algo falla, hay que saber **qué hay escondido** para poder arreglarlo.
+
+### Lo que te van a preguntar en una entrevista
+
+No te pedirán que recites las cinco letras de SOLID (aunque a veces es la primera pregunta). Te enseñarán código y te preguntarán **qué está mal y por qué**.
+
+### Y con la IA, todavía más
+
+La IA escribe código en segundos. **Lo que no hace es decidir si ese código está bien.** Eso te toca a ti, y para revisar código hacen falta criterios. SOLID y los patrones son esos criterios.
+
+Además, son el **vocabulario común** de cualquier equipo. En una revisión de código basta con decir *"esto rompe Liskov"* o *"aquí falta un builder"*, y todos se entienden en una línea.
+
+> **Lo contrario tampoco:** aprender patrones no es meterlos en todas partes. Usar un patrón donde no hace falta se llama **sobreingeniería**, y es tan mal diseño como no usarlos. La regla: **si no tienes el problema, no apliques la solución**.
+
+---
 
 ## 2. Punto de partida: el proyecto `Productos`
 
