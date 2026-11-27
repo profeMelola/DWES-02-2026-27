@@ -35,8 +35,6 @@ No te pedirán que recites las cinco letras de SOLID (aunque a veces es la prime
 
 La IA escribe código en segundos. **Lo que no hace es decidir si ese código está bien.** Eso te toca a ti, y para revisar código hacen falta criterios. SOLID y los patrones son esos criterios.
 
-Además, son el **vocabulario común** de cualquier equipo. En una revisión de código basta con decir *"esto rompe Liskov"* o *"aquí falta un builder"*, y todos se entienden en una línea.
-
 > **Lo contrario tampoco:** aprender patrones no es meterlos en todas partes. Usar un patrón donde no hace falta se llama **sobreingeniería**, y es tan mal diseño como no usarlos. La regla: **si no tienes el problema, no apliques la solución**.
 
 ---
