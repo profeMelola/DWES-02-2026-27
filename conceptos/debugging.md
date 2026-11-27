@@ -98,10 +98,4 @@
 | **Cambiar un valor** | Clic derecho sobre una variable → **Set Value** (F2) | Forzar un caso (por ejemplo, un año inválido) sin rellenar el formulario otra vez |
 | **Depurar un test** | Botón 🐞 junto al test de `SeguridadTest` | Ver dentro del controlador el usuario simulado que crea `@WithMockUser` |
 
----
 
-## Resumen
-
-1. **Breakpoint + modo debug** (🐞): la aplicación se para y ves todas las variables.
-2. **F8 avanza, F7 entra, Shift+F8 sale.**
-3. Antes de llenar el código de `System.out.println`, **pon un breakpoint**.
