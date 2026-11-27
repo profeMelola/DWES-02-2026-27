@@ -23,7 +23,7 @@ Es verdad que **nadie escribe a mano** un Singleton o un Proxy en un proyecto Sp
 | `UsuarioDetailsService` traduce tu `Usuario` a lo que espera Spring | **S** + patrón **Adapter** | Práctica de Spring Security, paso 3 |
 | `Libro.builder()`, `User.builder()` | Patrón **Builder** | Práctica de Spring Security, paso 3 |
 | Un `@Service` que no guarda datos de usuario | Patrón **Singleton** | [Singleton: cuidado con el estado](#singleton-cuidado-con-el-estado) |
-| `@Transactional` que "no funciona" si lo llamas desde la misma clase | Patrón **Proxy** | UT04 (si no sabes que existe, pierdes un día buscando el fallo) |
+| `@Transactional` que "no funciona" si lo llamas desde la misma clase.  | Patrón **Proxy** | UT04 (Las anotaciones de Spring (@Transactional, @PreAuthorize...) solo funcionan cuando la llamada viene de fuera de la clase. Si un método llama a otro de la misma clase, la anotación se ignora.)|
 
 Cuando algo falla, hay que saber **qué hay escondido** para poder arreglarlo.
 
