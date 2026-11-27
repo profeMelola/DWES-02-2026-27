@@ -43,9 +43,9 @@ class SeguridadTest { ... }
 
 Para la seguridad es lo correcto: queremos comprobar que filtros, roles, CSRF, `UsuarioDetailsService` y BCrypt funcionan **juntos**.
 
-## 3. JUnit 5
+## 3. JUnit 5: es el motor que ejecuta todos los tests, desde los unitarios hasta los de integración. 
 
-`@Test` marca un método como test. Las comprobaciones se hacen con `Assertions`:
+`@Test` marca un método como test (casos de prueba). Las comprobaciones se hacen con `Assertions`:
 
 | Assert | Comprueba que… | Ejemplo |
 |---|---|---|
@@ -61,7 +61,7 @@ Para la seguridad es lo correcto: queremos comprobar que filtros, roles, CSRF, `
 
 > Ojo con el orden: **primero el valor esperado, después el real**. Al revés, el mensaje de error te despista.
 
-### Ejemplo: una clase sin dependencias
+### Ejemplo de prueba unitaria: una clase sin dependencias
 
 El mapper no depende de nada: basta con un `new`. Ni Spring ni base de datos.
 
